@@ -12,11 +12,13 @@ Eleven guiding principles for UI/UX, programming, and architecture—for humans 
 
 **[Read the complete principles →](skills/total-programming/SKILL.md)**
 
-## Install from GitHub
+## Install
 
-This is a private repository. Authenticate Git access with an account that can read `romeobravo/total-programming`.
+Requires Node.js 20+ on your PATH and Claude Code or Pi. No runtime dependencies, build step, or API keys of its own.
 
-In Claude Code, send these as two separate commands:
+### Claude Code
+
+Send these as **two separate commands** in Claude Code:
 
 ```text
 /plugin marketplace add romeobravo/total-programming
@@ -26,87 +28,23 @@ In Claude Code, send these as two separate commands:
 /plugin install total-programming@total-programming
 ```
 
-For Pi (using your GitHub SSH access):
-
-```bash
-pi install git:git@github.com:romeobravo/total-programming
-```
-
-Restart the agent after installation. For local development or installation without GitHub, use the checkout instructions below.
-
-## Install from a local checkout
-
-Requires Node.js 20+ on your PATH and Claude Code or Pi. No runtime dependencies, build step, or API keys of its own.
-
-### Claude Code
-
-In Claude Code, run these as **two separate commands**, replacing the path if your checkout lives elsewhere:
-
-```text
-/plugin marketplace add ~/personal/total-programming
-```
-
-```text
-/plugin install total-programming@total-programming
-```
-
-Restart Claude Code after installing. The plugin adds the full principles as context on session start, including resume, clear, and compaction. It also provides the explicit skill:
+Restart Claude Code. The plugin adds the full principles as context on session start, including resume, clear, and compaction. You can also invoke the skill explicitly:
 
 ```text
 /total-programming:total-programming
 ```
 
-Try the checkout for one session without installing:
-
-```bash
-claude --plugin-dir ~/personal/total-programming
-```
-
-To uninstall:
-
-```text
-/plugin uninstall total-programming@total-programming
-```
-
 ### Pi
 
 ```bash
-pi install ~/personal/total-programming
+pi install git:github.com/romeobravo/total-programming
 ```
 
-Restart Pi, or use `/reload` in an existing session. The extension appends the full principles to the system prompt before each agent run, without replacing existing instructions. The skill is also available explicitly:
+Restart Pi, or use `/reload` in an existing session. The extension appends the full principles to the system prompt before each agent run, without replacing existing instructions. You can also invoke the skill explicitly:
 
 ```text
 /skill:total-programming
 ```
-
-To uninstall:
-
-```bash
-pi remove ~/personal/total-programming
-```
-
-Pi references the local checkout directly; keep it in place. Edits to the principles are picked up on the next agent run. Claude Code's installed plugin may be cached: use `--plugin-dir` during development to load the working checkout directly.
-
-### Skill only (no automatic injection)
-
-If you prefer on-demand guidance, symlink the skill directory into your agent's personal skill directory instead of installing the plugin/package. Do not overwrite an existing skill with the same name.
-
-Claude Code:
-
-```bash
-mkdir -p ~/.claude/skills
-ln -s "$HOME/personal/total-programming/skills/total-programming" "$HOME/.claude/skills/total-programming"
-```
-
-Pi:
-
-```bash
-mkdir -p ~/.pi/agent/skills
-ln -s "$HOME/personal/total-programming/skills/total-programming" "$HOME/.pi/agent/skills/total-programming"
-```
-
-Invoke `/total-programming` in Claude Code or `/skill:total-programming` in Pi. Skill-only installation makes the guidance available; it does **not** guarantee the complete text is loaded automatically on every task. Remove only the created symlink to uninstall.
 
 ## How it works
 
@@ -117,7 +55,28 @@ Invoke `/total-programming` in Claude Code or `/skill:total-programming` in Pi. 
 
 The principles guide judgment rather than enforce behavior. Installing them does not guarantee model compliance or prove an improvement in development speed.
 
-## Development
+## Local development
+
+Clone the repository wherever you keep your projects:
+
+```bash
+git clone https://github.com/romeobravo/total-programming.git
+cd total-programming
+```
+
+Try Claude Code with the local plugin for one session, without installing it:
+
+```bash
+claude --plugin-dir .
+```
+
+Or install the checkout in Pi:
+
+```bash
+pi install "$PWD"
+```
+
+Pi references the local checkout directly; keep it in place. Edits to the principles are picked up on the next agent run. Claude Code's installed plugin may be cached: use `--plugin-dir` during development to load the working checkout directly.
 
 Edit the skill, then run:
 
@@ -127,6 +86,42 @@ claude plugin validate .
 ```
 
 No `npm install` is needed. Tests check all eleven headings, both adapters, prompt preservation, repeat application, and package paths. The Claude hook works independently of the current working directory.
+
+### Skill only (no automatic injection)
+
+If you prefer on-demand guidance, symlink the skill directory into your agent's personal skill directory instead of installing the plugin/package. Run the appropriate commands **from the repository root**. Do not overwrite an existing skill with the same name.
+
+Claude Code:
+
+```bash
+mkdir -p ~/.claude/skills
+ln -s "$PWD/skills/total-programming" "$HOME/.claude/skills/total-programming"
+```
+
+Pi:
+
+```bash
+mkdir -p ~/.pi/agent/skills
+ln -s "$PWD/skills/total-programming" "$HOME/.pi/agent/skills/total-programming"
+```
+
+Invoke `/total-programming` in Claude Code or `/skill:total-programming` in Pi. Skill-only installation makes the guidance available; it does **not** guarantee the complete text is loaded automatically on every task. Keep the checkout in place while using these links.
+
+## Uninstall
+
+Claude Code:
+
+```text
+/plugin uninstall total-programming@total-programming
+```
+
+Pi, when installed from GitHub:
+
+```bash
+pi remove git:github.com/romeobravo/total-programming
+```
+
+For a local Pi installation, run `pi remove /absolute/path/to/total-programming` with your checkout's path. For a skill-only installation, remove only the symlink you created.
 
 ## Background
 
