@@ -27,7 +27,7 @@ Rows are from separate runs on different days; each is valid against its own bas
 
 ## Install
 
-Requires Node.js 20+ on your PATH and Claude Code or Pi. No runtime dependencies, build step, or API keys of its own.
+Requires Claude Code, Codex, OpenCode, Cursor, Pi, or Hermes Agent. No runtime dependencies, build step, or API keys of its own. The Claude Code, Codex, and Pi adapters additionally need Node.js 20+ on your PATH; the Hermes adapter needs Python 3.10+ (already required by Hermes).
 
 ### Claude Code
 
@@ -47,6 +47,48 @@ Restart Claude Code. The plugin adds the full principles as context on session s
 /total-programming:total-programming
 ```
 
+### Codex
+
+Send these as **two separate commands** in Codex:
+
+```text
+codex plugin marketplace add romeobravo/total-programming
+```
+
+```text
+codex plugin add total-programming@total-programming
+```
+
+Restart Codex. The plugin points at the same hook and skills as Claude Code, so the principles also arrive on resume, clear, and compaction.
+
+### OpenCode
+
+Clone the repository, then add the plugin file to `opencode.json`:
+
+```json
+{ "plugin": ["/absolute/path/to/total-programming/.opencode/plugins/total-programming.mjs"] }
+```
+
+Keep the clone in place. The plugin appends the full principles to the system prompt every turn, registers `/total-programming` as a command, and exposes the skills directory to OpenCode.
+
+### Cursor
+
+Copy the always-on rule into your project:
+
+```bash
+mkdir -p .cursor/rules
+cp /absolute/path/to/total-programming/.cursor/rules/total-programming.mdc .cursor/rules/
+```
+
+Or fetch it without cloning:
+
+```bash
+mkdir -p .cursor/rules
+curl -o .cursor/rules/total-programming.mdc https://raw.githubusercontent.com/romeobravo/total-programming/main/.cursor/rules/total-programming.mdc
+```
+
+Cursor picks the rule up on the next request. It is instruction-only: no commands, no hooks.
+
 ### Pi
 
 ```bash
@@ -59,12 +101,23 @@ Restart Pi, or use `/reload` in an existing session. The extension appends the f
 /skill:total-programming
 ```
 
+### Hermes Agent
+
+```bash
+hermes plugins install romeobravo/total-programming --enable
+```
+
+Restart Hermes after installing. The plugin injects the full principles before each LLM turn, registers the skill as `total-programming:total-programming`, and adds `/total-programming [on|off]` to switch injection (default on; runtime state is process-local, so it resets on restart). Set the `TOTAL_PROGRAMMING_ENABLED` env var to `0`/`1` for a persistent default.
+
 ## How it works
 
 - `skills/total-programming/SKILL.md` is the single source of truth.
-- `hooks/session-start.js` supplies the same text to Claude Code as session context.
+- `hooks/session-start.js` supplies the same text to Claude Code as session context, and `.codex-plugin/plugin.json` points Codex at the same hook and skills.
 - `pi-extension/index.js` appends it to Pi's existing system prompt.
-- Both adapters strip the skill's YAML metadata; neither modifies project instruction files, changes tool permissions, or calls a network service.
+- `.opencode/plugins/total-programming.mjs` appends it to OpenCode's system prompt every turn and registers `/total-programming`.
+- `.cursor/rules/total-programming.mdc` is the instruction-only Cursor rule.
+- `plugin.yaml` and `__init__.py` inject it into Hermes Agent before each LLM call and register the skill and `/total-programming`.
+- All adapters strip the skill's YAML metadata; none modifies project instruction files, changes tool permissions, or calls a network service.
 
 The principles guide judgment rather than enforce behavior. Installing them does not guarantee model compliance or prove an improvement in development speed.
 
