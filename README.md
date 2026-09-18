@@ -1,6 +1,10 @@
-# Total Programming
+<p align="center">
+  <img src="assets/cruijff.png" width="220" alt="Total Programming logo — black-and-white line-art portrait">
+</p>
 
-**Preserve pace through agility.**
+<h1 align="center">Total Programming</h1>
+
+<p align="center"><em>Preserve pace through agility.</em></p>
 
 Build software that solves complex problems without making the next move harder than it needs to be. Like Total Football, sustained pace comes from clear responsibilities, coordinated movement, and simple passes that keep the next move available.
 
