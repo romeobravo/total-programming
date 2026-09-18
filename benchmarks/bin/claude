@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Isolate upstream benchmark Claude calls; retain init evidence and raw events."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+args = sys.argv[1:]
+real = os.environ['BENCH_CLAUDE_BIN']
+if args == ['--version']:
+    sys.exit(subprocess.call([real, *args]))
+
+args[args.index('--setting-sources') + 1] = ''
+args[args.index('--output-format') + 1] = 'stream-json'
+args += ['--safe-mode', '--disable-slash-commands', '--no-session-persistence',
+         '--tools', 'Read,Write,Edit,Glob,Grep', '--verbose',
+         '--max-budget-usd', '0.75']
+Path('_invocation.json').write_text(json.dumps([real, *args], indent=2))
+result = None
+init = None
+with Path('_events.jsonl').open('w') as trace:
+    proc = subprocess.Popen([real, *args], stdout=subprocess.PIPE, text=True)
+    for line in proc.stdout:
+        trace.write(line)
+        trace.flush()
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if event.get('type') == 'system' and event.get('subtype') == 'init':
+            init = event
+            Path('_init.json').write_text(json.dumps(event, indent=2))
+            unexpected = any(event.get(key) for key in ('plugins', 'skills', 'mcp_servers'))
+            if unexpected or set(event.get('tools', [])) - {'Read', 'Write', 'Edit', 'Glob', 'Grep'}:
+                proc.terminate()
+                raise SystemExit('Isolation failed: unexpected resources in init')
+        if event.get('type') == 'result':
+            result = event
+    status = proc.wait()
+if init is None or result is None:
+    print(json.dumps({'is_error': True, 'result': 'Missing init or result event', 'exit_code': status}))
+    sys.exit(1)
+print(json.dumps(result))
+sys.exit(status)
