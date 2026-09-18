@@ -12,6 +12,19 @@ Eleven guiding principles for UI/UX, programming, and architecture—for humans 
 
 **[Read the complete principles →](skills/total-programming/SKILL.md)**
 
+## Benchmark
+
+Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned agentic benchmark: real headless Claude Code sessions (Haiku 4.5, 19 tasks × 2 arms × 4 runs) editing a real FastAPI + React repo, scored on the delivered `git diff` and adversarial safety checks. Same tasks, fixture, and scorers as Ponytail's published run.
+
+| vs clean no-skill baseline | LOC | tokens | cost | time | safe |
+|---|---:|---:|---:|---:|---:|
+| ponytail (their run) | **−54%** | −22% | −20% | −27% | 100% |
+| total-programming (this run) | −43% | **−26%** | **−32%** | **−36%** | **100%** |
+
+The principles cut code most where an over-build trap exists (color picker −68%, star rating −64%) and are a wash on irreducible code. They never forced the one-liner: the date picker still legitimately used Radix. All 28/28 adversarial safety checks passed — including the path-traversal guard a bare "prefer one-liners" prompt drops.
+
+Rows are from separate runs on different days; each is valid against its own baseline. Full method, per-task tables, and limits: [benchmarks/results/2026-09-18-haiku.md](benchmarks/results/2026-09-18-haiku.md).
+
 ## Install
 
 Requires Node.js 20+ on your PATH and Claude Code or Pi. No runtime dependencies, build step, or API keys of its own.
