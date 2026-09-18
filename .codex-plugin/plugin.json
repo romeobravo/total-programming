@@ -1,0 +1,18 @@
+{
+  "name": "total-programming",
+  "version": "0.2.0",
+  "description": "Preserve pace through agility. Eleven principles for UI/UX, programming, and architecture.",
+  "author": {
+    "name": "Ruben Buitelaar"
+  },
+  "homepage": "https://github.com/romeobravo/total-programming",
+  "repository": "https://github.com/romeobravo/total-programming",
+  "keywords": [
+    "principles",
+    "simplicity",
+    "architecture",
+    "productivity"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}
