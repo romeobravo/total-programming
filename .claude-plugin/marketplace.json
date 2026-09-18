@@ -1,0 +1,14 @@
+{
+  "name": "total-programming",
+  "description": "Total Programming: preserve pace through agility.",
+  "owner": {
+    "name": "Ruben Buitelaar"
+  },
+  "plugins": [
+    {
+      "name": "total-programming",
+      "source": "./",
+      "description": "Preserve pace through agility with Total Programming."
+    }
+  ]
+}

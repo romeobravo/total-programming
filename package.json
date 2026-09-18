@@ -1,0 +1,27 @@
+{
+  "name": "total-programming",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Preserve pace through agility. Total Programming principles for Claude Code and Pi.",
+  "author": "Ruben Buitelaar",
+  "keywords": [
+    "pi-package",
+    "agent-skills",
+    "total-programming"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "pi": {
+    "extensions": [
+      "./pi-extension/index.js"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}
