@@ -10,21 +10,29 @@ Build software that solves complex problems without making the next move harder 
 
 Eleven guiding principles for UI/UX, programming, and architecture—for humans and AI agents. Not a rigid workflow, code-golf prompt, or permission to cut essential quality.
 
+## Contents
+
+- [The principles](#the-principles)
+- [Benchmark](#benchmark)
+- [Install](#install)
+- [How it works](#how-it-works)
+- [Local development](#local-development)
+- [Uninstall](#uninstall)
+- [Background](#background)
+
 ## The principles
 
-| # | Principle | Descriptor |
-|---|---|---|
-| 1 | Start with purpose, not implementation | Intent |
-| 2 | Fit the problem, not its noise | Parsimony |
-| 3 | Try removing before adding | Subtraction |
-| 4 | Reduce complexity across the whole system | Holism |
-| 5 | Make understanding easy | Clarity |
-| 6 | Give each part a clear responsibility | Atomicity |
-| 7 | Discover what could invalidate the approach first | Falsification |
-| 8 | Let evidence correct the design | Empiricism |
-| 9 | Keep decisions reversible to preserve momentum | Reversibility |
-| 10 | Limit downside while enabling upside | Asymmetry |
-| 11 | Progress through small, complete, verifiable steps | Progression |
+1. [Start with purpose, not implementation](#1-start-with-purpose-not-implementation--intent) — *Intent*
+2. [Fit the problem, not its noise](#2-fit-the-problem-not-its-noise--parsimony) — *Parsimony*
+3. [Try removing before adding](#3-try-removing-before-adding--subtraction) — *Subtraction*
+4. [Reduce complexity across the whole system](#4-reduce-complexity-across-the-whole-system--holism) — *Holism*
+5. [Make understanding easy](#5-make-understanding-easy--clarity) — *Clarity*
+6. [Give each part a clear responsibility](#6-give-each-part-a-clear-responsibility--atomicity) — *Atomicity*
+7. [Discover what could invalidate the approach first](#7-discover-what-could-invalidate-the-approach-first--falsification) — *Falsification*
+8. [Let evidence correct the design](#8-let-evidence-correct-the-design--empiricism) — *Empiricism*
+9. [Keep decisions reversible to preserve momentum](#9-keep-decisions-reversible-to-preserve-momentum--reversibility) — *Reversibility*
+10. [Limit downside while enabling upside](#10-limit-downside-while-enabling-upside--asymmetry) — *Asymmetry*
+11. [Progress through small, complete, verifiable steps](#11-progress-through-small-complete-verifiable-steps--progression) — *Progression*
 
 The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), which is the single source of truth. Below, each principle is paired with a Johan Cruyff quote, where it comes from on the pitch, and why it belongs in software.
 
