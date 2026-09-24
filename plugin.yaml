@@ -1,5 +1,5 @@
 name: total-programming
-version: 0.2.0
+version: 0.3.0
 description: Preserve pace through agility. Eleven principles for UI/UX, programming, and architecture, injected as always-on context, with the skill and /total-programming command.
 author: Ruben Buitelaar
 provides_hooks:

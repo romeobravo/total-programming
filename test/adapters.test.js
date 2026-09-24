@@ -11,17 +11,17 @@ import totalProgramming from '../pi-extension/index.js';
 const root = new URL('../', import.meta.url);
 const json = (path) => JSON.parse(readFileSync(new URL(path, root), 'utf8'));
 const titles = [
-  'Start with purpose, not implementation',
-  'Choose the simplest solution that sufficiently solves the problem',
-  'Try removing before adding',
-  'Reduce complexity across the whole system',
-  'Make understanding easy',
-  'Give each part a clear responsibility',
-  'Resolve consequential uncertainty early',
-  'Let evidence correct the design',
-  'Keep decisions reversible',
-  'Limit downside while enabling upside',
-  'Progress through small, complete, verifiable steps',
+  'Start with purpose, not implementation (Intent)',
+  'Fit the problem, not its noise (Parsimony)',
+  'Try removing before adding (Subtraction)',
+  'Reduce complexity across the whole system (Holism)',
+  'Make understanding easy (Clarity)',
+  'Give each part a clear responsibility (Atomicity)',
+  'Discover what could invalidate the approach first (Falsification)',
+  'Let evidence correct the design (Empiricism)',
+  'Keep decisions reversible to preserve momentum (Reversibility)',
+  'Limit downside while enabling upside (Asymmetry)',
+  'Progress through small, complete, verifiable steps (Progression)',
 ];
 
 function handler() {

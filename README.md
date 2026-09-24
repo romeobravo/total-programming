@@ -10,7 +10,115 @@ Build software that solves complex problems without making the next move harder 
 
 Eleven guiding principles for UI/UX, programming, and architecture—for humans and AI agents. Not a rigid workflow, code-golf prompt, or permission to cut essential quality.
 
-**[Read the complete principles →](skills/total-programming/SKILL.md)**
+## The principles
+
+| # | Principle | Descriptor |
+|---|---|---|
+| 1 | Start with purpose, not implementation | Intent |
+| 2 | Fit the problem, not its noise | Parsimony |
+| 3 | Try removing before adding | Subtraction |
+| 4 | Reduce complexity across the whole system | Holism |
+| 5 | Make understanding easy | Clarity |
+| 6 | Give each part a clear responsibility | Atomicity |
+| 7 | Discover what could invalidate the approach first | Falsification |
+| 8 | Let evidence correct the design | Empiricism |
+| 9 | Keep decisions reversible to preserve momentum | Reversibility |
+| 10 | Limit downside while enabling upside | Asymmetry |
+| 11 | Progress through small, complete, verifiable steps | Progression |
+
+The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), which is the single source of truth. Below, each principle is paired with a Johan Cruyff quote, where it comes from on the pitch, and why it belongs in software.
+
+### 1. Start with purpose, not implementation — *Intent*
+
+> "I hate someone who moves but doesn't know where to."
+
+**On the pitch.** In Total Football, movement without the ball only helps when it serves the shared plan: every run creates space for a teammate or an option for the pass. A player running without direction pulls the team's shape apart.
+
+**In software.** Know what someone needs to accomplish and what success looks like before choosing screens, frameworks, or functions. A shared intent lets people work independently and still converge. Without it, activity looks like progress while the system drifts apart.
+
+### 2. Fit the problem, not its noise — *Parsimony*
+
+> "Football is simple. Playing simple football is hard."
+
+**On the pitch.** Cruyff's teams won through sequences of simple, well-timed passes rather than one brilliant manoeuvre. The hard part is the discipline to choose the simple option when a spectacular one is available.
+
+**In software.** Our natural tendency is to overfit: to shape a solution around every edge case, request, and hypothetical need in front of us. A parsimonious solution captures what the problem consistently requires and ignores the noise, which is exactly why it handles the next case better. Building for needs nobody has observed is overfitting too, just to imagined data.
+
+### 3. Try removing before adding — *Subtraction*
+
+> "Quality isn't running a lot; it's being in the right place at the right moment."
+
+**On the pitch.** A player who reads the game runs less, not more. Good positioning removes the need to chase; effort spent compensating for poor positioning is effort wasted.
+
+**In software.** Many problems are symptoms of an unnecessary rule, step, dependency, or distinction. Removing the cause eliminates the whole chain of compensating solutions: the extra setting, the explanatory tooltip, the special case. Subtraction is a solution, not a cleanup chore.
+
+### 4. Reduce complexity across the whole system — *Holism*
+
+> "If you're not somewhere, you're either too early or too late."
+
+**On the pitch.** In Total Football, a player's position only makes sense relative to the whole team. Being in the wrong place is never a local error: it leaves a gap that someone else has to cover.
+
+**In software.** A shorter implementation is not simpler if users must do more work, and a quick delivery is not quick if it creates recurring operational work. Count the burden wherever it lands: users, interfaces, code, data, operations, support, and maintenance. Moving complexity somewhere else is not removing it.
+
+### 5. Make understanding easy — *Clarity*
+
+> "If I had wanted you to understand it, I would have explained it better."
+
+**On the pitch.** Cruyff was famous for cryptic one-liners, known in Dutch as *Cruijffiaans*, that people still debate decades later. Charming from a football legend.
+
+**In software.** Costly anywhere else. Read the quote as a warning. Users should understand what they can do and what happened; maintainers should understand what the code does and why it exists. The next person or agent who must change your work should not need an oracle.
+
+### 6. Give each part a clear responsibility — *Atomicity*
+
+> "I'm the worst if I have to defend the whole garden, but I'm the best if I have to defend this part. Everything is about space, nothing more."
+
+**On the pitch.** Zonal defending: each player is responsible for a defined space, so the team defends as a coordinated unit instead of everyone chasing the ball.
+
+**In software.** Like the Unix philosophy, each part should do one thing well. Small, explicit interfaces and clear responsibilities let you change, test, replace, or remove a part without coordinating every change across the whole system. Atomic does not mean tiny; it means the smallest unit that still carries a coherent responsibility.
+
+### 7. Discover what could invalidate the approach first — *Falsification*
+
+> "The truth is never exactly as you expect it will be."
+
+**On the pitch.** Pressing. Cruyff's teams hunted the ball high up the pitch, because winning it back near the opponent's goal is cheap, and defending in your own box is expensive.
+
+**In software.** Uncertainty works the same way. Confront the assumption that could invalidate your approach while being wrong still costs a spike, not a rebuild. Try to prove it wrong with the smallest credible prototype, test, or working slice, and rank uncertainty by its consequences, not by technical difficulty or interest.
+
+### 8. Let evidence correct the design — *Empiricism*
+
+> "Every disadvantage has its advantage."
+
+**On the pitch.** Cruyff's most famous line. A setback reveals something you could not see before, and the team that adjusts to it gains the edge.
+
+**In software.** Treat proposed benefits as hypotheses. Observed behavior, experiments, and working software should correct your expectations, especially when they disagree with you. A failed assumption is often the most valuable thing you learn, if you let it change the design. Neither popularity nor theory is proof.
+
+### 9. Keep decisions reversible to preserve momentum — *Reversibility*
+
+> "If we have the ball, they can't score."
+
+**On the pitch.** Possession. As long as you keep the ball, you decide the next move and the opponent can only react. Lose it, and the initiative is theirs.
+
+**In software.** A reversible decision keeps the next move yours; an irreversible one gives the ball away. Prefer choices that can be changed, replaced, or removed without rebuilding everything around them, and require stronger evidence for commitments that are hard to undo. Momentum comes from acting on what you learn, not from refusing to change course.
+
+### 10. Limit downside while enabling upside — *Asymmetry*
+
+> "If you can't win, make sure you don't lose."
+
+**On the pitch.** Knowing when to secure the result. When the win is not on, protecting against the loss keeps you in the game for the next opportunity.
+
+**In software.** Look for meaningful benefits with bounded costs and failure impact. Do not force every user or component through extra complexity to benefit a subset; make specialized capabilities independently usable without burdening the core path. Bounded downside is what makes experimentation affordable, but optional never means free.
+
+### 11. Progress through small, complete, verifiable steps — *Progression*
+
+> "You will understand it when you get it."
+
+**On the pitch.** Build-up play: progressing the ball through short passes that each keep possession and open the next option, rather than gambling on one long ball.
+
+**In software.** Build a sequence of small, complete, verifiable changes rather than one elaborate solution. Each step delivers coherent value or answers a meaningful question, and builds toward something larger. Understanding follows the step: when the next iteration is affordable, fewer decisions need to be settled upfront. Reduce scope, never essential quality.
+
+### When principles pull in different directions
+
+> **What is the simplest effective move we can make and validate now that preserves our freedom to make the next one?**
 
 ## Benchmark
 
@@ -24,6 +132,8 @@ Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned ag
 The principles cut code most where an over-build trap exists (color picker −68%, star rating −64%) and are a wash on irreducible code. They never forced the one-liner: the date picker still legitimately used Radix. All 28/28 adversarial safety checks passed — including the path-traversal guard a bare "prefer one-liners" prompt drops.
 
 Rows are from separate runs on different days; each is valid against its own baseline. Full method, per-task tables, and limits: [benchmarks/results/2026-09-18-haiku.md](benchmarks/results/2026-09-18-haiku.md).
+
+Results were measured on the v0.2.0 wording. Principles 2, 6, 7, 9 and 11 have since been refined and the descriptors added; these changes have not yet been re-measured.
 
 ## Install
 
@@ -194,3 +304,5 @@ For a local Pi installation, run `pi remove /absolute/path/to/total-programming`
 By Ruben Buitelaar, building on [What if Johan Cruyff Was a Software Engineer?](https://medium.com/@rubenbuitelaar/what-if-johan-cruyff-was-a-software-engineer-237d22da5bb?sk=527a69571726edc74f1dd263a1509f63) and his work on tackling complexity.
 
 Packaging inspired by [Ponytail](https://github.com/DietrichGebert/ponytail); implementation and principles are independent.
+
+Cruyff quotes are translated from Dutch, some loosely to convey their intent. Like most *Cruijffiaans*, they circulate in several versions.
