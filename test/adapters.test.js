@@ -11,17 +11,17 @@ import totalProgramming from '../pi-extension/index.js';
 const root = new URL('../', import.meta.url);
 const json = (path) => JSON.parse(readFileSync(new URL(path, root), 'utf8'));
 const titles = [
-  'Start with purpose, not implementation (Intent)',
-  'Fit the problem, not its noise (Parsimony)',
-  'Try removing before adding (Subtraction)',
-  'Reduce complexity across the whole system (Holism)',
+  'Start with the goal and why it matters (Intent)',
   'Make understanding easy (Clarity)',
   'Give each part a clear responsibility (Atomicity)',
-  'Discover what could invalidate the approach first (Falsification)',
-  'Let evidence correct the design (Empiricism)',
-  'Keep decisions reversible to preserve momentum (Reversibility)',
-  'Limit downside while enabling upside (Asymmetry)',
-  'Progress through small, complete, verifiable steps (Progression)',
+  'Prefer reversible decisions to preserve momentum (Reversibility)',
+  'Enable upside while limiting downside (Asymmetry)',
+  'Fit the problem, not its noise (Parsimony)',
+  'Tackle consequential uncertainty first (Falsification)',
+  'Try removing before adding (Subtraction)',
+  'Let evidence shape the design (Empiricism)',
+  'Reduce complexity across the whole system (Holism)',
+  'Progress in small, verifiable steps (Progression)',
 ];
 
 function handler() {
