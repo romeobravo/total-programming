@@ -35,9 +35,11 @@ Choose a new output directory for each run. Existing evidence is never overwritt
 
 ## Results
 
-See [`results/2026-09-18-haiku.md`](results/2026-09-18-haiku.md): on Haiku 4.5,
-the principles cut delivered code 43%, cost 32%, and time 36% on the feature tier
-while passing every safety gate.
+See [`results/2026-09-25-haiku.md`](results/2026-09-25-haiku.md): on Haiku 4.5,
+measured on the v0.4.0 wording, the principles cut delivered code 40%, cost 46%,
+and time 45% on the feature tier while passing every safety gate. The earlier run
+on the v0.2.0 wording ([2026-09-18](results/2026-09-18-haiku.md)) cut 43% LOC at
+−32% cost.
 
 The upstream scorer selftests run before any cells. The runner stops scheduling new
 cells after a CLI error, missing result, permission denial, or isolation failure;

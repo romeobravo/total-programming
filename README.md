@@ -139,13 +139,11 @@ Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned ag
 | vs clean no-skill baseline | LOC | tokens | cost | time | safe |
 |---|---:|---:|---:|---:|---:|
 | ponytail (their run) | **−54%** | −22% | −20% | −27% | 100% |
-| total-programming (this run) | −43% | **−26%** | **−32%** | **−36%** | **100%** |
+| total-programming (v0.4.0 wording, 2026-09-25) | −40% | **−49%** | **−46%** | **−45%** | **100%** |
 
-The principles cut code most where an over-build trap exists (color picker −68%, star rating −64%) and are a wash on irreducible code. They never forced the one-liner: the date picker still legitimately used Radix. All 28/28 adversarial safety checks passed — including the path-traversal guard a bare "prefer one-liners" prompt drops.
+The principles cut code most where an over-build trap exists (color picker −86%, star rating −58%) and are a wash on irreducible code. They never forced the one-liner: the color picker still wraps the native `<input type="color">`. All 28/28 adversarial safety checks passed — including the path-traversal guard a bare "prefer one-liners" prompt drops.
 
-Rows are from separate runs on different days; each is valid against its own baseline. Full method, per-task tables, and limits: [benchmarks/results/2026-09-18-haiku.md](benchmarks/results/2026-09-18-haiku.md).
-
-Results were measured on the v0.2.0 wording and order. The principles have since been refined, renumbered and given descriptors; these changes have not yet been re-measured.
+Rows are from separate runs on different days; each is valid against its own baseline. Earlier runs: the v0.2.0 wording measured on 2026-09-18 ([results](benchmarks/results/2026-09-18-haiku.md)) cut 43% LOC at −32% cost. Full method, per-task tables, and limits: [benchmarks/results/2026-09-25-haiku.md](benchmarks/results/2026-09-25-haiku.md).
 
 ## Install
 
