@@ -32,6 +32,8 @@ def main():
     ap.add_argument('--fixture', type=Path, required=True)
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--pilot', action='store_true', help='One safe-path cell per arm')
+    ap.add_argument('--arms', default='baseline,total-programming',
+                    help='Comma-separated subset of baseline,total-programming,ponytail')
     ap.add_argument('--workers', type=int, default=3)
     ap.add_argument('--resume', action='store_true')
     args = ap.parse_args()
@@ -63,9 +65,15 @@ def main():
     skill = (ROOT / 'skills/total-programming/SKILL.md').read_text()
     principles = skill.split('---', 2)[2].strip()
     bench.ARMS['total-programming'] = lambda: principles
+    if 'ponytail' in args.arms.split(','):
+        bench.ARMS['ponytail'] = lambda: (upstream / 'skills/ponytail/SKILL.md').read_text(encoding='utf-8')
+        # Raw --append-system-prompt instead of upstream's --plugin-dir mechanism, so all
+        # extra arms enter the prompt the same way and the comparison stays mechanism-blind.
+        bench.PLUGIN_ARMS = ()
+    arms = args.arms.split(',')
     tasks, repeats = (['safe-path'], 1) if args.pilot else (FEATURES + SAFETY, 4)
     cells = [(t, a, 'haiku', r) for t in tasks for r in range(repeats)
-             for a in ['baseline', 'total-programming']]
+             for a in arms]
     random.Random(20260918).shuffle(cells)
     output.mkdir(parents=True, exist_ok=True)
     manifest = {

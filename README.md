@@ -145,6 +145,8 @@ The principles cut code most where an over-build trap exists (color picker −86
 
 Rows are from separate runs on different days; each is valid against its own baseline. Earlier runs: the v0.2.0 wording measured on 2026-09-18 ([results](benchmarks/results/2026-09-18-haiku.md)) cut 43% LOC at −32% cost. Full method, per-task tables, and limits: [benchmarks/results/2026-09-25-haiku.md](benchmarks/results/2026-09-25-haiku.md).
 
+Post-hoc analysis of the same runs adds two axes: deterministic complexity (lizard, over delivered source) and a blind pairwise readability judge (Sonnet 4.6, anonymous A/B). Total Programming delivers less code by building less — per-function complexity is flat versus the baseline on features and ~30% lower on the safety tasks — and the blind judge prefers its solutions 16–8. Ponytail's own arm, run under the same harness, delivered the smallest code but timed out on 21 of 76 cells.
+
 ## Install
 
 Requires Claude Code, Codex, OpenCode, Cursor, Pi, or Hermes Agent. No runtime dependencies, build step, or API keys of its own. The Claude Code, Codex, and Pi adapters additionally need Node.js 20+ on your PATH; the Hermes adapter needs Python 3.10+ (already required by Hermes).

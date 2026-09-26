@@ -33,6 +33,18 @@ python3 benchmarks/run.py \
 
 Choose a new output directory for each run. Existing evidence is never overwritten.
 
+Extra arms: `--arms` restricts or extends the run, e.g. `--arms ponytail` runs
+Ponytail's own SKILL.md under the same harness (appended raw, same CLI and model).
+
+## Post-hoc analysis
+
+- `benchmarks/complexity.py --run <dir>` — deterministic cyclomatic complexity
+  (lizard) over each cell's delivered source (tests excluded); writes
+  `complexity.json` into the run directory. Requires `pip install lizard`.
+- `benchmarks/judge_readability.py --run <dir>` — blind pairwise readability
+  judge (Sonnet via the Claude Code CLI, anonymous A/B, position-balanced);
+  writes `judge_readability.json`. Directional evidence, not a measurement.
+
 ## Results
 
 See [`results/2026-09-25-haiku.md`](results/2026-09-25-haiku.md): on Haiku 4.5,
