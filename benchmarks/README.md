@@ -41,9 +41,7 @@ Ponytail's own SKILL.md under the same harness (appended raw, same CLI and model
 - `benchmarks/complexity.py --run <dir>` — deterministic cyclomatic complexity
   (lizard) over each cell's delivered source (tests excluded); writes
   `complexity.json` into the run directory. Requires `pip install lizard`.
-- `benchmarks/judge_readability.py --run <dir>` — blind pairwise readability
-  judge (Sonnet via the Claude Code CLI, anonymous A/B, position-balanced);
-  writes `judge_readability.json`. Directional evidence, not a measurement.
+- `benchmarks/judge_readability.py --run-a <dir-a> --arm-a NAME --run-b <dir-b> --arm-b NAME` — blind pairwise readability judge (Sonnet via the Claude Code CLI, anonymous A/B, position-balanced); arms may live in different run dirs; writes the result JSON via `--out` (default `<run-a>/judge_readability.json`). Directional evidence, not a measurement.
 
 ## Results
 

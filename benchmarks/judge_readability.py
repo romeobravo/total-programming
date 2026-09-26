@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """Blind pairwise readability judge for the agentic benchmark.
 
-For every feature task, pairs each baseline repetition with the same Total
-Programming repetition and asks a judge model (via the Claude Code CLI, so it
-uses the same subscription auth as the cells) which anonymous solution it would
-rather maintain. The judge never learns which arm produced which solution; the
-A/B order alternates per repetition to balance position bias.
+Pairs each repetition of arm A with the same repetition of arm B and asks a
+judge model (via the Claude Code CLI, so it uses the same subscription auth as
+the cells) which anonymous solution it would rather maintain. The judge never
+learns which arm produced which solution; the A/B order alternates per
+repetition to balance position bias. Arms may live in different run
+directories (e.g. comparing arms from separate runs).
 
-  python3 benchmarks/judge_readability.py --run benchmarks/runs/<dir> [--judge sonnet] [--workers 4]
+  python3 benchmarks/judge_readability.py \
+      --run-a benchmarks/runs/<dir-a> --arm-a total-programming \
+      --run-b benchmarks/runs/<dir-b> --arm-b ponytail \
+      [--judge sonnet] [--workers 4] [--out PATH]
 
 Reads delivered source files via tree-diff against the fixture commit the cells
-were run with (tests excluded). Writes judge_readability.json next to the run's
-summary.json and prints aggregates. A judgment is directional evidence, not a
-deterministic measurement.
+were run with (tests excluded). Writes the result JSON via --out (default:
+<run-a>/judge_readability.json) and prints aggregates. A judgment is
+directional evidence, not a deterministic measurement.
 """
 import argparse, json, hashlib, statistics, subprocess, sys, tempfile, os
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -87,22 +91,28 @@ def judge_pair(judge, pair, a_text, b_text, a_arm, b_arm):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--run', type=Path, required=True)
+    ap.add_argument('--run-a', type=Path, required=True, help='Run dir holding arm A cells')
+    ap.add_argument('--arm-a', default='total-programming')
+    ap.add_argument('--run-b', type=Path, required=True, help='Run dir holding arm B cells')
+    ap.add_argument('--arm-b', default='baseline')
+    ap.add_argument('--out', type=Path, help='Result JSON (default: <run-a>/judge_readability.json)')
     ap.add_argument('--fixture', type=Path, default=Path('/tmp/total-programming-benchmark-fixture'))
     ap.add_argument('--judge', default='sonnet')
     ap.add_argument('--workers', type=int, default=4)
     args = ap.parse_args()
-    run, fx = args.run.resolve(), fixture_hashes(args.fixture.resolve())
+    run_a, run_b = args.run_a.resolve(), args.run_b.resolve()
+    arm_a, arm_b = args.arm_a, args.arm_b
+    fx = fixture_hashes(args.fixture.resolve())
 
     jobs = []
     for task in FEATURES:
         for rep in range(4):
-            b = run / f'{task}__baseline__haiku__{rep}'
-            t = run / f'{task}__total-programming__haiku__{rep}'
-            if not (b.is_dir() and t.is_dir()): continue
+            a = run_a / f'{task}__{arm_a}__haiku__{rep}'
+            b = run_b / f'{task}__{arm_b}__haiku__{rep}'
+            if not (a.is_dir() and b.is_dir()): continue
             # Alternate which arm is shown as A to balance position bias.
-            if rep % 2 == 0: jobs.append((task, rep, t, b, 'total-programming', 'baseline'))
-            else:            jobs.append((task, rep, b, t, 'baseline', 'total-programming'))
+            if rep % 2 == 0: jobs.append((task, rep, a, b, arm_a, arm_b))
+            else:            jobs.append((task, rep, b, a, arm_b, arm_a))
 
     def one(job):
         task, rep, ws_a, ws_b, a_arm, b_arm = job
@@ -132,14 +142,16 @@ def main():
     summary = {
         'judge_model': args.judge, 'pairs': len(jobs), 'valid': len(valid),
         'blinding': 'A/B order alternates by repetition; judge sees no arm names',
-        'total-programming': arm_stats('total-programming'),
-        'baseline': arm_stats('baseline'),
+        arm_a: arm_stats(arm_a),
+        arm_b: arm_stats(arm_b),
         'ties': sum(1 for r in valid if r['prefer'] == 'tie'),
-        'per_task': {t: {str(r['pair'][1]): r['prefer'] if (r['a_arm'] == 'total-programming') else
+        'per_task': {t: {str(r['pair'][1]): r['prefer'] if (r['a_arm'] == arm_a) else
                          {'a': 'b', 'b': 'a', 'tie': 'tie'}[r['prefer']]
                          for r in valid if r['pair'][0] == t} for t in FEATURES},
     }
-    (run / 'judge_readability.json').write_text(json.dumps({'results': results, 'summary': summary}, indent=2))
+    out = args.out or (run_a / 'judge_readability.json')
+    out.write_text(json.dumps({'results': results, 'summary': summary}, indent=2))
+    print(f'wrote {out}')
     print(json.dumps(summary, indent=2))
 
 if __name__ == '__main__':
