@@ -34,6 +34,9 @@ def main():
     ap.add_argument('--pilot', action='store_true', help='One safe-path cell per arm')
     ap.add_argument('--arms', default='baseline,total-programming',
                     help='Comma-separated subset of baseline,total-programming,ponytail')
+    ap.add_argument('--model-id', help='Model id for every cell (e.g. glm-5.3-flash via '
+                                       'ANTHROPIC_BASE_URL to a compatible endpoint); '
+                                       'overrides the haiku/sonnet/opus shorthand')
     ap.add_argument('--workers', type=int, default=3)
     ap.add_argument('--resume', action='store_true')
     args = ap.parse_args()
@@ -70,6 +73,8 @@ def main():
         # Raw --append-system-prompt instead of upstream's --plugin-dir mechanism, so all
         # extra arms enter the prompt the same way and the comparison stays mechanism-blind.
         bench.PLUGIN_ARMS = ()
+    if args.model_id:
+        bench.MODELS['haiku'] = args.model_id
     arms = args.arms.split(',')
     tasks, repeats = (['safe-path'], 1) if args.pilot else (FEATURES + SAFETY, 4)
     cells = [(t, a, 'haiku', r) for t in tasks for r in range(repeats)
@@ -98,6 +103,10 @@ def main():
         'billing_note': 'Claude-reported list-price cost, not a statement of subscription charges.',
         'cells': cells,
     }
+    if args.model_id:
+        manifest['adaptations'].append(
+            f'Model override: every cell runs {args.model_id} via ANTHROPIC_BASE_URL to a '
+            'compatible endpoint; CLI-reported cost is not Anthropic list price here.')
     if args.resume:
         previous = json.loads((output / 'manifest.json').read_text())
         assert previous['skill_sha256'] == manifest['skill_sha256']
