@@ -37,6 +37,9 @@ def main():
     ap.add_argument('--model-id', help='Model id for every cell (e.g. glm-5.3-flash via '
                                        'ANTHROPIC_BASE_URL to a compatible endpoint); '
                                        'overrides the haiku/sonnet/opus shorthand')
+    ap.add_argument('--runner', choices=['claude', 'pi'], default='claude',
+                    help='Agent harness executing each cell')
+    ap.add_argument('--provider', default='zai', help='pi provider id (--runner pi)')
     ap.add_argument('--workers', type=int, default=3)
     ap.add_argument('--resume', action='store_true')
     args = ap.parse_args()
@@ -75,6 +78,96 @@ def main():
         bench.PLUGIN_ARMS = ()
     if args.model_id:
         bench.MODELS['haiku'] = args.model_id
+
+    def run_cell_pi(task_id, arm, model, workdir: Path):
+        """pi-equivalent of bench.run_cell: identical workspace setup, same
+        evidence files (_invocation/_events/_init/_claude.json + stderr with the
+        kill marker), so scoring, resume and isolation checks work unchanged."""
+        import time
+        task = bench.TASKS[task_id]
+        if task.get("fixture"):
+            fx = Path(task["fixture"])
+            if not fx.is_absolute():
+                fx = source / "fixtures" / task["fixture"]
+            shutil.copytree(fx, workdir, dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns("node_modules", ".git", "build", "dist",
+                                                          "dist-ssr", ".vite", "*.log", "__pycache__",
+                                                          "storage", ".venv", "venv", ".pytest_cache",
+                                                          "*.mp4", "*.mp3", "*.wav", "*.mov",
+                                                          "*service-account*.json",
+                                                          "nul", "con", "prn", "aux",
+                                                          "DatePicker*.tsx", "DatePicker*.jsx"))
+            manifest_files = sorted(str(p.relative_to(workdir)).replace("\\", "/")
+                                    for p in workdir.rglob("*") if p.is_file())
+            (workdir / "_fixture_files.json").write_text(json.dumps(manifest_files), encoding="utf-8")
+        for fn, content in task.get("seed", {}).items():
+            (workdir / fn).write_text(content, encoding="utf-8")
+        if task.get("fixture"):
+            bench._git_snapshot(workdir)
+        pi = shutil.which("pi")
+        if not pi:
+            sys.exit("pi CLI not found on PATH")
+        extra = bench.ARMS[arm]() if arm in bench.ARMS else None
+        append = (extra + "\n\n" + bench.NO_RUN) if extra else bench.NO_RUN
+        cmd = [pi, "-p", task["prompt"], "--mode", "json", "--no-session",
+               "--no-extensions", "--no-skills", "--provider", args.provider,
+               "--model", bench.MODELS[model], "--tools", "read,write,edit",
+               "--append-system-prompt", append]
+        (workdir / "_invocation.json").write_text(json.dumps(cmd, indent=2))
+        started = time.monotonic()
+        try:
+            with open(workdir / "_pi_events.jsonl", "wb") as so, \
+                 open(workdir / "_claude.stderr.txt", "wb") as se:
+                proc = subprocess.Popen(cmd, cwd=str(workdir), stdout=so, stderr=se,
+                                        start_new_session=True)
+                try:
+                    proc.wait(timeout=bench.CELL_TIMEOUT)
+                except subprocess.TimeoutExpired:
+                    bench._tree_kill(proc)
+                    try: proc.wait(timeout=15)
+                    except Exception: pass
+                    se.write(f"\n[KILLED after {bench.CELL_TIMEOUT}s timeout]".encode())
+        except Exception as e:
+            (workdir / "_claude.json").write_text(json.dumps({"error": str(e)[:300]}), encoding="utf-8")
+        result_text, in_tok, out_tok, turns = "", 0, 0, 0
+        events = []
+        trace = workdir / "_pi_events.jsonl"
+        if trace.exists():
+            for line in trace.read_text(errors="replace").splitlines():
+                try:
+                    o = json.loads(line)
+                except ValueError:
+                    continue
+                events.append(o)
+                if o.get("type") == "turn_end":
+                    turns += 1
+                if o.get("type") == "message_end":
+                    m = o.get("message", {})
+                    if m.get("role") == "assistant":
+                        u = m.get("usage") or {}
+                        in_tok += u.get("input") or 0
+                        out_tok += u.get("output") or 0
+                        c = m.get("content")
+                        if isinstance(c, list):
+                            for part in c:
+                                if isinstance(part, dict) and part.get("type") == "text":
+                                    result_text += part.get("text", "")
+                        elif isinstance(c, str):
+                            result_text += c
+        is_err = not any(o.get("type") == "agent_end" for o in events)
+        duration_ms = int((time.monotonic() - started) * 1000)
+        (workdir / "_claude.json").write_text(json.dumps({
+            "result": result_text if not is_err else "pi produced no agent_end event",
+            "total_cost_usd": None, "duration_ms": duration_ms, "num_turns": turns,
+            "is_error": is_err, "subtype": "success" if not is_err else "error",
+            "permission_denials": [],
+            "usage": {"input_tokens": in_tok, "output_tokens": out_tok,
+                      "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0},
+        }, indent=2))
+        (workdir / "_init.json").write_text(json.dumps(
+            {"plugins": [], "skills": [], "mcp_servers": []}, indent=2))
+        return bench.score_workspace(task_id, arm, model, workdir)
+
     arms = args.arms.split(',')
     tasks, repeats = (['safe-path'], 1) if args.pilot else (FEATURES + SAFETY, 4)
     cells = [(t, a, 'haiku', r) for t in tasks for r in range(repeats)
@@ -107,6 +200,10 @@ def main():
         manifest['adaptations'].append(
             f'Model override: every cell runs {args.model_id} via ANTHROPIC_BASE_URL to a '
             'compatible endpoint; CLI-reported cost is not Anthropic list price here.')
+    if args.runner == 'pi':
+        manifest['adaptations'].append(
+            f'Runner: pi coding agent (provider {args.provider}); cell tools read/write/edit '
+            '(no bash, glob, grep). Cost figures are upstream pricing metadata, not billed cost.')
     if args.resume:
         previous = json.loads((output / 'manifest.json').read_text())
         assert previous['skill_sha256'] == manifest['skill_sha256']
@@ -142,7 +239,10 @@ def main():
         task, arm, model, rep = cell
         ws = output / f'{task}__{arm}__{model}__{rep}'
         ws.mkdir()
-        scored = bench.run_cell(task, arm, model, ws)
+        if args.runner == 'pi':
+            scored = run_cell_pi(task, arm, model, ws)
+        else:
+            scored = bench.run_cell(task, arm, model, ws)
         if '[KILLED after 300s timeout]' in (ws / '_claude.stderr.txt').read_text():
             return score_timeout(cell, ws)
         raw = json.loads((ws / '_claude.json').read_text())
