@@ -145,6 +145,8 @@ The principles cut code most where an over-build trap exists (color picker −86
 
 Rows are from separate runs on different days; each is valid against its own baseline. Earlier runs: the v0.2.0 wording measured on 2026-09-18 ([results](benchmarks/results/2026-09-18-haiku.md)) cut 43% LOC at −32% cost. Full method, per-task tables, and limits: [benchmarks/results/2026-09-25-haiku.md](benchmarks/results/2026-09-25-haiku.md).
 
+A 2026-09-30 run on a much stronger model tier (GLM 5.3 Flash, pi harness; [results](benchmarks/results/2026-09-30-glm-flash.md)) shrinks the effect: the paired LOC cut drops to ~15%, the blind judge splits 7–6 toward the baseline, and ponytail's arm — complete delivery, smallest and structurally simplest code — wins the blind head-to-head 20–4. On capable models the baseline already builds simply, leaving principles far less to correct.
+
 Post-hoc analysis of the same runs adds two axes: deterministic complexity (lizard, over delivered source) and a blind pairwise readability judge (Sonnet 4.6, anonymous A/B). Total Programming delivers less code by building less — per-function complexity is flat versus the baseline on features and ~35% lower on the safety tasks — and the blind judge prefers its solutions 16–8. Ponytail's own arm, run under the same harness, delivered the smallest code but timed out on 21 of 76 first-attempt cells; all 21 completed on an independent retry under identical conditions (first-attempt completion: 72%).
 
 ## Install
