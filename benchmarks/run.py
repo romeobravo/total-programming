@@ -123,9 +123,19 @@ def main():
                  open(workdir / "_claude.stderr.txt", "wb") as se:
                 proc = subprocess.Popen(cmd, cwd=str(workdir), stdout=so, stderr=se,
                                         start_new_session=True)
-                try:
-                    proc.wait(timeout=bench.CELL_TIMEOUT)
-                except subprocess.TimeoutExpired:
+                # Poll instead of blocking so a pathological cell (observed:
+                # tmpl-fe-datepicker x total-programming streaming a 400-600 MB
+                # _pi_events.jsonl) cannot balloon disk/RAM until the host OOM-killer
+                # takes down the whole runner. Same kill marker as the wall-time cap,
+                # so the cell is scored as a timeout and the 600 s retry picks it up.
+                while proc.poll() is None:
+                    if time.monotonic() - started >= bench.CELL_TIMEOUT:
+                        break
+                    time.sleep(5)
+                    if (workdir / "_pi_events.jsonl").exists() and \
+                            (workdir / "_pi_events.jsonl").stat().st_size > 256 * 1024 * 1024:
+                        break
+                if proc.poll() is None:
                     bench._tree_kill(proc)
                     try: proc.wait(timeout=15)
                     except Exception: pass
