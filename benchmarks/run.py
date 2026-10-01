@@ -41,6 +41,9 @@ def main():
                     help='Agent harness executing each cell')
     ap.add_argument('--provider', default='zai', help='pi provider id (--runner pi)')
     ap.add_argument('--timeout', type=int, help='Per-cell wall-time cap override (default: upstream 300s)')
+    ap.add_argument('--events-cap-mb', type=int, default=256,
+                    help='Kill a pi cell when _pi_events.jsonl exceeds this size (MB); '
+                         'thinking-heavy models stream full snapshots per delta')
     ap.add_argument('--workers', type=int, default=3)
     ap.add_argument('--resume', action='store_true')
     args = ap.parse_args()
@@ -133,7 +136,7 @@ def main():
                         break
                     time.sleep(5)
                     if (workdir / "_pi_events.jsonl").exists() and \
-                            (workdir / "_pi_events.jsonl").stat().st_size > 256 * 1024 * 1024:
+                            (workdir / "_pi_events.jsonl").stat().st_size > args.events_cap_mb * 1024 * 1024:
                         break
                 if proc.poll() is None:
                     bench._tree_kill(proc)
@@ -219,6 +222,8 @@ def main():
             '(no bash, glob, grep). Cost figures are upstream pricing metadata, not billed cost.')
     if args.timeout:
         manifest['adaptations'].append(f'Per-cell timeout override: {args.timeout}s (upstream default 300s).')
+    if args.events_cap_mb != 256:
+        manifest['adaptations'].append(f'Pi events cap: {args.events_cap_mb} MB (default 256 MB).')
     if args.resume:
         previous = json.loads((output / 'manifest.json').read_text())
         assert previous['skill_sha256'] == manifest['skill_sha256']
