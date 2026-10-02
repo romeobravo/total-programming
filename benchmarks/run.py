@@ -9,9 +9,11 @@ import json
 import os
 from pathlib import Path
 import random
+import re
 import shutil
 import subprocess
 import sys
+import threading
 
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES = ['tmpl-fe-datepicker', 'tmpl-fe-colorpicker', 'tmpl-fe-command',
@@ -34,6 +36,16 @@ def main():
     ap.add_argument('--pilot', action='store_true', help='One safe-path cell per arm')
     ap.add_argument('--arms', default='baseline,total-programming',
                     help='Comma-separated subset of baseline,total-programming,ponytail')
+    ap.add_argument('--model-id', help='Model id for every cell (e.g. glm-5.3-flash via '
+                                       'ANTHROPIC_BASE_URL to a compatible endpoint); '
+                                       'overrides the haiku/sonnet/opus shorthand')
+    ap.add_argument('--runner', choices=['claude', 'pi'], default='claude',
+                    help='Agent harness executing each cell')
+    ap.add_argument('--provider', default='zai', help='pi provider id (--runner pi)')
+    ap.add_argument('--timeout', type=int, help='Per-cell wall-time cap override (default: upstream 300s)')
+    ap.add_argument('--events-cap-mb', type=int, default=256,
+                    help='Kill a pi cell when _pi_events.jsonl exceeds this size (MB); '
+                         'thinking-heavy models stream full snapshots per delta')
     ap.add_argument('--workers', type=int, default=3)
     ap.add_argument('--resume', action='store_true')
     args = ap.parse_args()
@@ -70,6 +82,137 @@ def main():
         # Raw --append-system-prompt instead of upstream's --plugin-dir mechanism, so all
         # extra arms enter the prompt the same way and the comparison stays mechanism-blind.
         bench.PLUGIN_ARMS = ()
+    if args.model_id:
+        bench.MODELS['haiku'] = args.model_id
+    if args.timeout:
+        bench.CELL_TIMEOUT = args.timeout
+
+    def run_cell_pi(task_id, arm, model, workdir: Path):
+        """pi-equivalent of bench.run_cell: identical workspace setup, same
+        evidence files (_invocation/_events/_init/_claude.json + stderr with the
+        kill marker), so scoring, resume and isolation checks work unchanged."""
+        import time
+        task = bench.TASKS[task_id]
+        if task.get("fixture"):
+            fx = Path(task["fixture"])
+            if not fx.is_absolute():
+                fx = source / "fixtures" / task["fixture"]
+            shutil.copytree(fx, workdir, dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns("node_modules", ".git", "build", "dist",
+                                                          "dist-ssr", ".vite", "*.log", "__pycache__",
+                                                          "storage", ".venv", "venv", ".pytest_cache",
+                                                          "*.mp4", "*.mp3", "*.wav", "*.mov",
+                                                          "*service-account*.json",
+                                                          "nul", "con", "prn", "aux",
+                                                          "DatePicker*.tsx", "DatePicker*.jsx"))
+            manifest_files = sorted(str(p.relative_to(workdir)).replace("\\", "/")
+                                    for p in workdir.rglob("*") if p.is_file())
+            (workdir / "_fixture_files.json").write_text(json.dumps(manifest_files), encoding="utf-8")
+        for fn, content in task.get("seed", {}).items():
+            (workdir / fn).write_text(content, encoding="utf-8")
+        if task.get("fixture"):
+            bench._git_snapshot(workdir)
+        pi = shutil.which("pi")
+        if not pi:
+            sys.exit("pi CLI not found on PATH")
+        extra = bench.ARMS[arm]() if arm in bench.ARMS else None
+        append = (extra + "\n\n" + bench.NO_RUN) if extra else bench.NO_RUN
+        cmd = [pi, "-p", task["prompt"], "--mode", "json", "--no-session",
+               "--no-extensions", "--no-skills", "--provider", args.provider,
+               "--model", bench.MODELS[model], "--tools", "read,write,edit",
+               "--append-system-prompt", append]
+        (workdir / "_invocation.json").write_text(json.dumps(cmd, indent=2))
+        started = time.monotonic()
+        events_path = workdir / "_pi_events.jsonl"
+        latest_path = workdir / "_pi_events_latest.json"
+        # pi's json mode emits a FULL snapshot of the message so far with every
+        # streaming delta (assistantMessageEvent.partial incl. thinking), so on a
+        # reasoning model the raw trace grows quadratically with thinking length
+        # (250-620 MB cells observed, two host OOM kills). Route message_update
+        # events to a one-slot sidecar that only ever holds the newest snapshot;
+        # append everything else (turn_end, message_end, agent_end, tool events)
+        # to the trace as before. Scoring reads only the non-update events, so
+        # evidence and resume behaviour are unchanged.
+        update_re = re.compile(rb'"type"\s*:\s*"message_update"')
+
+        def _pump(stream, out, latest):
+            with open(latest, "wb") as lf:
+                for line in iter(stream.readline, b""):
+                    if update_re.search(line[:400]):
+                        lf.seek(0)
+                        lf.truncate()
+                        lf.write(line)
+                        lf.flush()
+                    else:
+                        out.write(line)
+                        out.flush()
+
+        try:
+            with open(events_path, "wb") as so, \
+                 open(workdir / "_claude.stderr.txt", "wb") as se:
+                proc = subprocess.Popen(cmd, cwd=str(workdir), stdout=subprocess.PIPE,
+                                        stderr=se, start_new_session=True)
+                pump = threading.Thread(target=_pump,
+                                        args=(proc.stdout, so, latest_path), daemon=True)
+                pump.start()
+                # Poll instead of blocking so the wall-time cap stops a stuck cell
+                # (with deduped capture the size guard below should never fire, but
+                # keep it as a belt-and-braces net). Same kill marker as before, so
+                # the cell is scored as a timeout and a retry picks it up.
+                while proc.poll() is None:
+                    if time.monotonic() - started >= bench.CELL_TIMEOUT:
+                        break
+                    time.sleep(5)
+                    if events_path.exists() and \
+                            events_path.stat().st_size > args.events_cap_mb * 1024 * 1024:
+                        break
+                if proc.poll() is None:
+                    bench._tree_kill(proc)
+                    try: proc.wait(timeout=15)
+                    except Exception: pass
+                    se.write(f"\n[KILLED after {bench.CELL_TIMEOUT}s timeout]".encode())
+                pump.join(timeout=15)
+        except Exception as e:
+            (workdir / "_claude.json").write_text(json.dumps({"error": str(e)[:300]}), encoding="utf-8")
+        result_text, in_tok, out_tok, turns = "", 0, 0, 0
+        events = []
+        trace = workdir / "_pi_events.jsonl"
+        if trace.exists():
+            for line in trace.read_text(errors="replace").splitlines():
+                try:
+                    o = json.loads(line)
+                except ValueError:
+                    continue
+                events.append(o)
+                if o.get("type") == "turn_end":
+                    turns += 1
+                if o.get("type") == "message_end":
+                    m = o.get("message", {})
+                    if m.get("role") == "assistant":
+                        u = m.get("usage") or {}
+                        in_tok += u.get("input") or 0
+                        out_tok += u.get("output") or 0
+                        c = m.get("content")
+                        if isinstance(c, list):
+                            for part in c:
+                                if isinstance(part, dict) and part.get("type") == "text":
+                                    result_text += part.get("text", "")
+                        elif isinstance(c, str):
+                            result_text += c
+        is_err = not any(o.get("type") == "agent_end" for o in events)
+        duration_ms = int((time.monotonic() - started) * 1000)
+        (workdir / "_claude.json").write_text(json.dumps({
+            "result": result_text if not is_err else "pi produced no agent_end event",
+            "total_cost_usd": None, "duration_ms": duration_ms, "num_turns": turns,
+            "is_error": is_err, "subtype": "success" if not is_err else "error",
+            "permission_denials": [],
+            "usage": {"input_tokens": in_tok, "output_tokens": out_tok,
+                      "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0},
+        }, indent=2))
+        (workdir / "_init.json").write_text(json.dumps(
+            {"plugins": [], "skills": [], "mcp_servers": []}, indent=2))
+        return bench.score_workspace(task_id, arm, model, workdir)
+
     arms = args.arms.split(',')
     tasks, repeats = (['safe-path'], 1) if args.pilot else (FEATURES + SAFETY, 4)
     cells = [(t, a, 'haiku', r) for t in tasks for r in range(repeats)
@@ -98,6 +241,22 @@ def main():
         'billing_note': 'Claude-reported list-price cost, not a statement of subscription charges.',
         'cells': cells,
     }
+    if args.model_id:
+        manifest['adaptations'].append(
+            f'Model override: every cell runs {args.model_id} via ANTHROPIC_BASE_URL to a '
+            'compatible endpoint; CLI-reported cost is not Anthropic list price here.')
+    if args.runner == 'pi':
+        manifest['adaptations'].append(
+            f'Runner: pi coding agent (provider {args.provider}); cell tools read/write/edit '
+            '(no bash, glob, grep). Cost figures are upstream pricing metadata, not billed cost.')
+        manifest['adaptations'].append(
+            'Pi event capture deduped: streaming message_update snapshots go to a one-slot '
+            'sidecar (_pi_events_latest.json) instead of being appended, so the trace grows '
+            'linearly rather than quadratically with thinking length.')
+    if args.timeout:
+        manifest['adaptations'].append(f'Per-cell timeout override: {args.timeout}s (upstream default 300s).')
+    if args.events_cap_mb != 256:
+        manifest['adaptations'].append(f'Pi events cap: {args.events_cap_mb} MB (default 256 MB).')
     if args.resume:
         previous = json.loads((output / 'manifest.json').read_text())
         assert previous['skill_sha256'] == manifest['skill_sha256']
@@ -114,8 +273,9 @@ def main():
         task, arm, model, rep = cell
         scored = bench.score_workspace(task, arm, model, ws)
         scored.update(repetition=rep, valid_run=False, cli_subtype='timeout',
-                      workspace=ws.name, actual_models=[], run_error='Killed after 300 seconds',
-                      duration_ms=300000, cost=None)
+                      workspace=ws.name, actual_models=[],
+                      run_error=f'Killed after {bench.CELL_TIMEOUT} seconds',
+                      duration_ms=bench.CELL_TIMEOUT * 1000, cost=None)
         return scored
 
     if args.resume:
@@ -133,8 +293,11 @@ def main():
         task, arm, model, rep = cell
         ws = output / f'{task}__{arm}__{model}__{rep}'
         ws.mkdir()
-        scored = bench.run_cell(task, arm, model, ws)
-        if '[KILLED after 300s timeout]' in (ws / '_claude.stderr.txt').read_text():
+        if args.runner == 'pi':
+            scored = run_cell_pi(task, arm, model, ws)
+        else:
+            scored = bench.run_cell(task, arm, model, ws)
+        if f'[KILLED after {bench.CELL_TIMEOUT}s timeout]' in (ws / '_claude.stderr.txt').read_text():
             return score_timeout(cell, ws)
         raw = json.loads((ws / '_claude.json').read_text())
         init = json.loads((ws / '_init.json').read_text())

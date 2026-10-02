@@ -19,25 +19,44 @@ args += ['--safe-mode', '--disable-slash-commands', '--no-session-persistence',
 Path('_invocation.json').write_text(json.dumps([real, *args], indent=2))
 result = None
 init = None
-with Path('_events.jsonl').open('w') as trace:
-    proc = subprocess.Popen([real, *args], stdout=subprocess.PIPE, text=True)
-    for line in proc.stdout:
-        trace.write(line)
-        trace.flush()
-        try:
-            event = json.loads(line)
-        except ValueError:
-            continue
-        if event.get('type') == 'system' and event.get('subtype') == 'init':
-            init = event
-            Path('_init.json').write_text(json.dumps(event, indent=2))
-            unexpected = any(event.get(key) for key in ('plugins', 'skills', 'mcp_servers'))
-            if unexpected or set(event.get('tools', [])) - {'Read', 'Write', 'Edit', 'Glob', 'Grep'}:
-                proc.terminate()
-                raise SystemExit('Isolation failed: unexpected resources in init')
-        if event.get('type') == 'result':
-            result = event
-    status = proc.wait()
+attempt = 0
+started = __import__('time').monotonic()
+while True:
+    mode = 'a' if attempt else 'w'
+    with Path('_events.jsonl').open(mode) as trace:
+        if attempt:
+            trace.write(json.dumps({'type': 'retry_note', 'attempt': attempt,
+                                    'reason': 'transient auth error (endpoint throttling)'}) + '\n')
+        proc = subprocess.Popen([real, *args], stdout=subprocess.PIPE, text=True)
+        for line in proc.stdout:
+            trace.write(line)
+            trace.flush()
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if event.get('type') == 'system' and event.get('subtype') == 'init':
+                init = event
+                Path('_init.json').write_text(json.dumps(event, indent=2))
+                unexpected = any(event.get(key) for key in ('plugins', 'skills', 'mcp_servers'))
+                if unexpected or set(event.get('tools', [])) - {'Read', 'Write', 'Edit', 'Glob', 'Grep'}:
+                    proc.terminate()
+                    raise SystemExit('Isolation failed: unexpected resources in init')
+            if event.get('type') == 'result':
+                result = event
+        status = proc.wait()
+    if result and not result.get('is_error'):
+        break
+    err_text = str(result.get('result', '')) if result else ''
+    if 'Failed to authenticate' not in err_text:
+        break  # non-transient failure: leave to the caller
+    import time as _time
+    if _time.monotonic() - started > 120 or attempt >= 3:
+        break  # out of wall-time budget inside the 300s cap, or out of retries
+    attempt += 1
+    _time.sleep(45)
+    result = None
+    init = None
 if init is None or result is None:
     print(json.dumps({'is_error': True, 'result': 'Missing init or result event', 'exit_code': status}))
     sys.exit(1)
