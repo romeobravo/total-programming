@@ -8,10 +8,10 @@
 
 <p align="center">
   <a href="#1-start-with-the-goal-and-why-it-matters--intent">1. Intent</a><br>
-  <a href="#2-make-understanding-easy--clarity">2. Clarity</a> •
-  <a href="#3-give-each-part-a-clear-responsibility--atomicity">3. Atomicity</a> •
+  <a href="#2-make-it-obvious-not-explained--clarity">2. Clarity</a> •
+  <a href="#3-give-each-part-one-responsibility-and-a-small-surface--atomicity">3. Atomicity</a> •
   <a href="#4-prefer-reversible-decisions-to-preserve-momentum--reversibility">4. Reversibility</a> •
-  <a href="#5-enable-upside-while-limiting-downside--asymmetry">5. Asymmetry</a><br>
+  <a href="#5-focus-where-it-matters--asymmetry">5. Asymmetry</a><br>
   <a href="#6-fit-the-problem-not-its-noise--parsimony">6. Parsimony</a> •
   <a href="#8-try-removing-before-adding--subtraction">8. Subtraction</a> •
   <a href="#10-reduce-complexity-across-the-whole-system--holism">10. Holism</a><br>
@@ -48,21 +48,21 @@ The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), 
 
 **In software.** Know what someone needs to accomplish, why it matters, and what success looks like before choosing screens, frameworks, or functions. A shared goal with its why lets people adapt the how—take a different route, improvise, swap roles—and still converge. Without it, activity looks like progress while the system drifts apart.
 
-### 2. Make understanding easy — *Clarity*
+### 2. Make it obvious, not explained — *Clarity*
 
 > "If I had wanted you to understand it, I would have explained it better."
 
 **On the pitch.** Cruyff was famous for cryptic one-liners, known in Dutch as *Cruijffiaans*, that people still debate decades later. Charming from a football legend.
 
-**In software.** Costly anywhere else. Read the quote as a warning. Users should understand what they can do and what happened; maintainers should understand what the code does and why it exists. The next person or agent who must change your work should not need an oracle.
+**In software.** Costly anywhere else. Read the quote as the anti-pattern: work that only makes sense once its author explains it. If something needs explaining, first ask whether it can be made obvious instead. Obvious is the result, not the first idea—as Cruyff knew, simple football is the hardest kind. The next person or agent who must change your work should not need an oracle.
 
-### 3. Give each part a clear responsibility — *Atomicity*
+### 3. Give each part one responsibility and a small surface — *Atomicity*
 
 > "I'm the worst if I have to defend the whole garden, but I'm the best if I have to defend this part. Everything is about space, nothing more."
 
-**On the pitch.** Zonal defending: each player is responsible for a defined space, so the team defends as a coordinated unit instead of everyone chasing the ball.
+**On the pitch.** Zonal defending: each player is responsible for a defined space, so the team defends as a coordinated unit instead of everyone chasing the ball. The zone is defined, not tiny.
 
-**In software.** Like the Unix philosophy, each part should do one thing well. Small, explicit interfaces and clear responsibilities let you change, test, replace, or remove a part without coordinating every change across the whole system. Atomic does not mean tiny; it means the smallest unit that still carries a coherent responsibility.
+**In software.** Like the Unix philosophy, each part should do one thing well—and like John Ousterhout's deep modules, it should put substantial behavior behind a simple interface. Atomic means indivisible, not small: a part is as large as its responsibility requires, and splitting it further only scatters one idea across several places. Many shallow parts don't remove complexity; they move it into the wiring between them.
 
 ### 4. Prefer reversible decisions to preserve momentum — *Reversibility*
 
@@ -72,13 +72,13 @@ The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), 
 
 **In software.** A reversible decision keeps the next move yours; an irreversible one gives the ball away. Most decisions are two-way doors, to borrow Jeff Bezos's distinction: make them quickly and let the result guide the next. Save deliberation and stronger evidence for one-way doors, the commitments that are hard to undo. Momentum comes from acting on what you learn, not from refusing to change course.
 
-### 5. Enable upside while limiting downside — *Asymmetry*
+### 5. Focus where it matters — *Asymmetry*
 
 > "If you can't win, make sure you don't lose."
 
-**On the pitch.** Knowing when to secure the result. When the win is not on, protecting against the loss keeps you in the game for the next opportunity.
+**On the pitch.** No team can play at full intensity everywhere for ninety minutes. It commits where the chance is real, and where the win is not on, it keeps its shape and protects the result.
 
-**In software.** Look for meaningful benefits with bounded costs and failure impact. Do not force every user or component through extra complexity to benefit a subset; make specialized capabilities independently usable without burdening the core path. Bounded downside is what makes experimentation affordable, but optional never means free. Together with Reversibility, this preserves optionality: one keeps the next move available, the other makes sure each move risks little and can gain much.
+**In software.** The Pareto principle applies: a few flows and pieces of code carry most of the value and most of the risk. Spend extra effort there—plan more, explore alternatives cheaply, get the details right—and move faster everywhere else while keeping failure contained. Prefer bets with bounded downside and open-ended upside, like an optional addition the core path does not depend on. Together with Reversibility, this preserves optionality: one keeps the next move available, the other makes sure each move risks little and can gain much.
 
 ### 6. Fit the problem, not its noise — *Parsimony*
 

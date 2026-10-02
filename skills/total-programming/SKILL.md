@@ -21,17 +21,17 @@ Understand what someone needs to accomplish, why it matters to them, and what su
 
 A shared goal, understood with its why, creates freedom to find the right solution: people can adapt the how without losing the what. Clarify consequential ambiguities, challenge work that does not serve the goal, and avoid confusing a proposed implementation with the underlying need.
 
-## 2. Make understanding easy (Clarity)
+## 2. Make it obvious, not explained (Clarity)
 
-Prefer clear language, familiar interactions, explicit state, and readable code over cleverness. Users should understand what they can do and what happened; maintainers should understand what the code does and why it exists.
+Prefer solutions whose behavior is evident from their form: clear language, familiar interactions, explicit state, and readable code over cleverness. Users should see what they can do and what happened; maintainers should see what the code does and why it exists.
 
-Understanding makes confident action possible. Optimize for the next person or agent who must use, inspect, or change what you build. Brevity helps only when it preserves clarity.
+If something needs explaining, first ask whether it can be made obvious instead. Obvious is the result, not the first idea: finding the solution that reads as inevitable is often the hard part. Optimize for the next person or agent who must use, inspect, or change what you build. Brevity helps only when it preserves clarity.
 
-## 3. Give each part a clear responsibility (Atomicity)
+## 3. Give each part one responsibility and a small surface (Atomicity)
 
-Organize the system into cohesive parts with small, explicit interfaces. Keep related behavior together and unnecessary dependencies apart. Like the Unix philosophy, each part should do one thing well: the smallest unit that still carries a coherent responsibility.
+Organize the system into parts that each do one thing well behind a small, explicit interface. Keep related behavior together and unnecessary dependencies apart. Atomic means indivisible, not small: a part should be as large as its responsibility requires, and splitting it further should not scatter one idea across several places.
 
-Clear responsibilities create freedom to act without coordinating every change across the whole system. Good boundaries make parts easier to reason about, test, replace, and remove—not merely smaller.
+Prefer deep parts—substantial behavior behind a simple contract—over many shallow ones whose interfaces are nearly as complex as what they hide. Clear responsibilities with small surfaces create freedom to act without coordinating every change across the whole system, and make parts easier to reason about, test, replace, and remove.
 
 ## 4. Prefer reversible decisions to preserve momentum (Reversibility)
 
@@ -39,11 +39,11 @@ Prefer choices that can be changed, replaced, or removed without rebuilding ever
 
 Most decisions are two-way doors: make them quickly and let the result guide the next one. Treat one-way doors—commitments that are difficult to undo—with care, and require stronger evidence before going through. Momentum comes from acting on what you learn, not from refusing to change course. Preserve options through focused solutions and good boundaries, not speculative flexibility.
 
-## 5. Enable upside while limiting downside (Asymmetry)
+## 5. Focus where it matters (Asymmetry)
 
-Avoid forcing every user or component through extra complexity to benefit a subset. Where appropriate, make specialized capabilities independently usable without burdening the core path.
+Effort, care, and rigor are limited; spend them in proportion to the stakes. Following the Pareto principle, a few flows, decisions, and pieces of code carry most of the upside or the downside—the most-used paths, the critical integrations, the choices that are hard to undo. There, invest in exploring alternatives cheaply before committing, and in getting the details right. Elsewhere, move faster and keep failure contained.
 
-Look for meaningful benefits with bounded costs and failure impact. This creates room to experiment, but optional does not mean free: controls, configuration, dependencies, and code still consume attention and require maintenance.
+Prefer bets with bounded downside and open-ended upside: an optional capability that the core path does not depend on can fail quietly or succeed widely. But optional does not mean free—every addition still consumes attention and maintenance, so it must earn its place.
 
 ## 6. Fit the problem, not its noise (Parsimony)
 
