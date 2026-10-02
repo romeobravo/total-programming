@@ -9,9 +9,11 @@ import json
 import os
 from pathlib import Path
 import random
+import re
 import shutil
 import subprocess
 import sys
+import threading
 
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES = ['tmpl-fe-datepicker', 'tmpl-fe-colorpicker', 'tmpl-fe-command',
@@ -121,28 +123,55 @@ def main():
                "--append-system-prompt", append]
         (workdir / "_invocation.json").write_text(json.dumps(cmd, indent=2))
         started = time.monotonic()
+        events_path = workdir / "_pi_events.jsonl"
+        latest_path = workdir / "_pi_events_latest.json"
+        # pi's json mode emits a FULL snapshot of the message so far with every
+        # streaming delta (assistantMessageEvent.partial incl. thinking), so on a
+        # reasoning model the raw trace grows quadratically with thinking length
+        # (250-620 MB cells observed, two host OOM kills). Route message_update
+        # events to a one-slot sidecar that only ever holds the newest snapshot;
+        # append everything else (turn_end, message_end, agent_end, tool events)
+        # to the trace as before. Scoring reads only the non-update events, so
+        # evidence and resume behaviour are unchanged.
+        update_re = re.compile(rb'"type"\s*:\s*"message_update"')
+
+        def _pump(stream, out, latest):
+            with open(latest, "wb") as lf:
+                for line in iter(stream.readline, b""):
+                    if update_re.search(line[:400]):
+                        lf.seek(0)
+                        lf.truncate()
+                        lf.write(line)
+                        lf.flush()
+                    else:
+                        out.write(line)
+                        out.flush()
+
         try:
-            with open(workdir / "_pi_events.jsonl", "wb") as so, \
+            with open(events_path, "wb") as so, \
                  open(workdir / "_claude.stderr.txt", "wb") as se:
-                proc = subprocess.Popen(cmd, cwd=str(workdir), stdout=so, stderr=se,
-                                        start_new_session=True)
-                # Poll instead of blocking so a pathological cell (observed:
-                # tmpl-fe-datepicker x total-programming streaming a 400-600 MB
-                # _pi_events.jsonl) cannot balloon disk/RAM until the host OOM-killer
-                # takes down the whole runner. Same kill marker as the wall-time cap,
-                # so the cell is scored as a timeout and the 600 s retry picks it up.
+                proc = subprocess.Popen(cmd, cwd=str(workdir), stdout=subprocess.PIPE,
+                                        stderr=se, start_new_session=True)
+                pump = threading.Thread(target=_pump,
+                                        args=(proc.stdout, so, latest_path), daemon=True)
+                pump.start()
+                # Poll instead of blocking so the wall-time cap stops a stuck cell
+                # (with deduped capture the size guard below should never fire, but
+                # keep it as a belt-and-braces net). Same kill marker as before, so
+                # the cell is scored as a timeout and a retry picks it up.
                 while proc.poll() is None:
                     if time.monotonic() - started >= bench.CELL_TIMEOUT:
                         break
                     time.sleep(5)
-                    if (workdir / "_pi_events.jsonl").exists() and \
-                            (workdir / "_pi_events.jsonl").stat().st_size > args.events_cap_mb * 1024 * 1024:
+                    if events_path.exists() and \
+                            events_path.stat().st_size > args.events_cap_mb * 1024 * 1024:
                         break
                 if proc.poll() is None:
                     bench._tree_kill(proc)
                     try: proc.wait(timeout=15)
                     except Exception: pass
                     se.write(f"\n[KILLED after {bench.CELL_TIMEOUT}s timeout]".encode())
+                pump.join(timeout=15)
         except Exception as e:
             (workdir / "_claude.json").write_text(json.dumps({"error": str(e)[:300]}), encoding="utf-8")
         result_text, in_tok, out_tok, turns = "", 0, 0, 0
@@ -220,6 +249,10 @@ def main():
         manifest['adaptations'].append(
             f'Runner: pi coding agent (provider {args.provider}); cell tools read/write/edit '
             '(no bash, glob, grep). Cost figures are upstream pricing metadata, not billed cost.')
+        manifest['adaptations'].append(
+            'Pi event capture deduped: streaming message_update snapshots go to a one-slot '
+            'sidecar (_pi_events_latest.json) instead of being appended, so the trace grows '
+            'linearly rather than quadratically with thinking length.')
     if args.timeout:
         manifest['adaptations'].append(f'Per-cell timeout override: {args.timeout}s (upstream default 300s).')
     if args.events_cap_mb != 256:
