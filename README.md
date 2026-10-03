@@ -6,13 +6,13 @@
 
 <p align="center"><em>A team of 11 principles for attacking hard problems at a sustained pace—for humans and AI agents.</em></p>
 
-<p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
-
 <p align="center">
   <img src="https://img.shields.io/github/v/release/romeobravo/total-programming?style=flat-square&color=111111&label=release" alt="Release">
   <img src="https://img.shields.io/badge/works%20with-6%20agents-111111?style=flat-square" alt="Works with 6 agents">
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
+
+<p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
 
 ## Contents
 
