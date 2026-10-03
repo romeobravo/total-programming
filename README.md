@@ -10,8 +10,6 @@
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
 
----
-
 <p align="center"><em>A team of 11 principles for attacking hard problems at a sustained pace—for humans and AI agents.</em></p>
 
 <p align="center">
@@ -49,8 +47,6 @@ Like Total Football, agility is not everyone moving faster independently. It com
 **We pursue simplicity not to build less capable software, but to preserve our ability to keep improving it.** These principles apply to interfaces, interactions, code, and architecture—for humans and AI agents alike.
 
 ## The principles
-
-The numbering follows the classic Dutch 1-4-3-3: keeper 1, defence 2–5, midfield 6, 8 and 10, attack 7, 9 and 11. It is a starting shape, not a hierarchy—in Total Football any player could take any position.
 
 The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), which is the single source of truth. Below, each principle is paired with a Johan Cruyff quote, where it comes from on the pitch, and why it belongs in software.
 
