@@ -12,6 +12,22 @@
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
 
+<p align="center">
+  <a href="#1-start-with-purpose-not-implementation">1. Purpose</a> •
+  <a href="#2-choose-the-simplest-solution-that-sufficiently-solves-the-problem">2. Simplicity</a> •
+  <a href="#3-try-removing-before-adding">3. Subtraction</a> •
+  <a href="#4-reduce-complexity-across-the-whole-system">4. Holism</a> •
+  <a href="#5-make-understanding-easy">5. Clarity</a> •
+  <a href="#6-give-each-part-a-clear-responsibility">6. Atomicity</a><br>
+  <a href="#7-resolve-consequential-uncertainty-early">7. Falsification</a> •
+  <a href="#8-let-evidence-correct-the-design">8. Empiricism</a> •
+  <a href="#9-keep-decisions-reversible">9. Reversibility</a> •
+  <a href="#10-limit-downside-while-enabling-upside">10. Asymmetry</a> •
+  <a href="#11-progress-through-small-complete-verifiable-steps">11. Progression</a>
+</p>
+
+**Build software that solves complex problems without making the next move harder than it needs to be.**
+
 <p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
 
 ## Contents
@@ -25,8 +41,6 @@
 - [Background](#background)
 
 ## Preserve pace through agility
-
-**Build software that solves complex problems without making the next move harder than it needs to be.**
 
 Sustained pace comes from the ability to understand, change, and validate software with little friction. Keep necessary complexity manageable and remove unnecessary complexity so that each addition does not progressively limit your freedom to act.
 
