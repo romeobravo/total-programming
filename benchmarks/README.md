@@ -41,9 +41,45 @@ Ponytail's own SKILL.md under the same harness (appended raw, same CLI and model
 - `benchmarks/complexity.py --run <dir>` — deterministic cyclomatic complexity
   (lizard) over each cell's delivered source (tests excluded); writes
   `complexity.json` into the run directory. Requires `pip install lizard`.
+- `benchmarks/judge_cpo.py --run-a <dir> --arm-a <arm> --run-b <dir> --arm-b <arm>`
+  — **the standard judge** (writes `judge_cpo.json`): a blind, position-balanced
+  pairwise product judge (Sonnet via the Claude Code CLI). Before scoring
+  anything it infers the shared intent and the capabilities unique to each
+  solution, generates three neutral future-change scenarios, then scores
+  current value (core quality; an extra counts only when a plausible user need
+  justifies it), future value (15-minute readability, change cost per scenario,
+  testability, over-engineering), names the single biggest risk per side, and
+  only then gives a verdict weighted by expected lifespan (production by
+  default). Every claim must cite concrete code locations, and the full
+  rationale is stored untruncated.
 - `benchmarks/judge_readability.py --run <dir>` — blind pairwise readability
-  judge (Sonnet via the Claude Code CLI, anonymous A/B, position-balanced);
-  writes `judge_readability.json`. Directional evidence, not a measurement.
+  judge; kept as a narrow supplementary axis, no longer the headline judge.
+
+### Why a CPO judge?
+
+Readability-only judging rewards the thinnest possible solution and cannot see
+what a simplification silently removes. The CPO judge evaluates solutions the
+way the principles themselves ask software to be judged — holistically:
+
+- **Intent before judgment.** Capabilities are weighed against inferred intent:
+  an extra is a virtue only when a plausible user need justifies it, and a
+  simplification is a virtue only when nothing plausible is lost. This is the
+  same test the Asymmetry and Parsimony principles apply.
+- **Current and future value as separate axes.** The principles promise
+  sustained pace, not small diffs: change cost against neutral future
+  scenarios, testability, and over-engineering are scored next to core quality.
+- **Evidence over style.** Cited code locations per claim, and both failure
+  modes are penalized — unexplained density *and* unnecessary abstraction —
+  so minimalism cannot win by default.
+
+This mattered measurably on the v0.5.0 run
+([results](results/2026-10-02-glm-flash-05.md)): the readability judge split
+15–8 for ponytail over total-programming, while the CPO judge — weighing
+silent capability regressions (a theme command that cannot return to
+"system"; a component labeled "DatePicker" that hides a bare native input)
+and untestable state sync — flipped to 17–7 for total-programming. Both
+judge outputs are kept in the run directory so readers can weigh the narrow
+and the holistic view side by side.
 
 ## Results
 
