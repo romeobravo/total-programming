@@ -4,13 +4,15 @@
 
 <h1 align="center">Total Programming</h1>
 
-<p align="center"><em>A team of 11 principles for attacking hard problems at a sustained pace—for humans and AI agents.</em></p>
-
 <p align="center">
   <img src="https://img.shields.io/github/v/release/romeobravo/total-programming?style=flat-square&color=111111&label=release" alt="Release">
   <img src="https://img.shields.io/badge/works%20with-6%20agents-111111?style=flat-square" alt="Works with 6 agents">
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
+
+---
+
+<p align="center"><em>A team of 11 principles for attacking hard problems at a sustained pace—for humans and AI agents.</em></p>
 
 <p align="center">
   <a href="#1-start-with-the-goal-and-why-it-matters--intent">1. Intent</a><br>
@@ -26,20 +28,19 @@
   <a href="#11-progress-in-small-verifiable-steps--progression">11. Progression</a>
 </p>
 
-**Build software that solves complex problems without making the next move harder than it needs to be.**
-
 <p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
 
 ## Contents
 
-- [Preserve pace through agility](#preserve-pace-through-agility)
+- [Philosophy](#philosophy)
+- [The principles](#the-principles)
 - [Benchmark](#benchmark)
 - [Install](#install)
 - [Local development](#local-development)
 - [Uninstall](#uninstall)
 - [Background](#background)
 
-## Preserve pace through agility
+## Philosophy
 
 Sustained pace comes from the ability to understand, change, and validate software with little friction. Keep necessary complexity manageable and remove unnecessary complexity so that each addition does not progressively limit your freedom to act.
 
