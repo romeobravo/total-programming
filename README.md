@@ -4,7 +4,13 @@
 
 <h1 align="center">Total Programming</h1>
 
-<p align="center"><em>11 principles for building software at a sustained pace—for humans and agents.</em></p>
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/romeobravo/total-programming?style=flat-square&color=111111&label=release" alt="Release">
+  <img src="https://img.shields.io/badge/works%20with-6%20agents-111111?style=flat-square" alt="Works with 6 agents">
+  <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
+</p>
+
+<p align="center"><em>A team of 11 principles for attacking hard problems with simple moves—for humans and AI agents.</em></p>
 
 <p align="center">
   <a href="#1-start-with-the-goal-and-why-it-matters--intent">1. Intent</a><br>
@@ -20,23 +26,27 @@
   <a href="#11-progress-in-small-verifiable-steps--progression">11. Progression</a>
 </p>
 
-Build software that solves complex problems without making the next move harder than it needs to be. Like Total Football, sustained pace comes from clear responsibilities, coordinated movement, and simple passes that keep the next move available.
-
-For product management, UI/UX, programming, and architecture.
+<p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
 
 ## Contents
 
+- [Philosophy](#philosophy)
 - [The principles](#the-principles)
 - [Benchmark](#benchmark)
 - [Install](#install)
-- [How it works](#how-it-works)
 - [Local development](#local-development)
 - [Uninstall](#uninstall)
 - [Background](#background)
 
-## The principles
+## Philosophy
 
-The numbering follows the classic Dutch 1-4-3-3: keeper 1, defence 2–5, midfield 6, 8 and 10, attack 7, 9 and 11. It is a starting shape, not a hierarchy—in Total Football any player could take any position.
+Sustained pace comes from the ability to understand, change, and validate software with little friction. Keep necessary complexity manageable and remove unnecessary complexity so that each addition does not progressively limit your freedom to act.
+
+Like Total Football, agility is not everyone moving faster independently. It comes from clear responsibilities, coordinated movement, and simple passes that keep the next move available.
+
+**We pursue simplicity not to build less capable software, but to preserve our ability to keep improving it.** These principles apply to interfaces, interactions, code, and architecture—for humans and AI agents alike.
+
+## The principles
 
 The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), which is the single source of truth. Below, each principle is paired with a Johan Cruyff quote, where it comes from on the pitch, and why it belongs in software.
 
@@ -134,22 +144,25 @@ The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), 
 
 ## Benchmark
 
-Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned agentic benchmark: real headless Claude Code sessions (Haiku 4.5, 19 tasks × 2 arms × 4 runs) editing a real FastAPI + React repo, scored on the delivered `git diff` and adversarial safety checks. Same tasks, fixture, and scorers as Ponytail's published run.
+Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned agentic benchmark on **GLM 5.3 Flash** (pi harness): 228 real headless agent sessions — 19 tasks × 3 arms (clean no-skill baseline, total-programming, ponytail) × 4 repetitions — editing a real FastAPI + React repo, scored on the delivered `git diff` and adversarial safety checks. Same tasks, fixture, and scorers as Ponytail's published run. All 228 cells delivered first-attempt, no timeouts. Full method, per-task tables, and limits: [benchmarks/results/2026-10-02-glm-flash-05.md](benchmarks/results/2026-10-02-glm-flash-05.md).
 
-| vs clean no-skill baseline | LOC | tokens | cost | time | safe |
-|---|---:|---:|---:|---:|---:|
-| ponytail (their run) | **−54%** | −22% | −20% | −27% | 100% |
-| total-programming (v0.4.0 wording, 2026-09-25) | −40% | **−49%** | **−46%** | **−45%** | **100%** |
+| metric | baseline | total-programming | ponytail |
+|---|---:|---:|---:|
+| delivered | 76/76 | 76/76 | 76/76 |
+| correct | 73/76 | **76/76** | 75/76 |
+| safe | 74/76 | **76/76** | 75/76 |
+| LOC, geo-mean vs baseline | — | 79.1% | 39.3% |
+| tokens, per-task median | 25.1k | 22.5k | 11.9k |
+| wall time, median | 182.5 s | 145.0 s | 65.0 s |
+| safety cc_mean (lizard) | 4.68 | 3.36 | 2.64 |
+| CPO judge, current value (1–5) | 3.38 | **3.75** | 3.58 |
+| CPO judge, future value (1–5) | 3.25 | **3.83** | 3.83 |
 
-The principles cut code most where an over-build trap exists (color picker −86%, star rating −58%) and are a wash on irreducible code. They never forced the one-liner: the color picker still wraps the native `<input type="color">`. All 28/28 adversarial safety checks passed — including the path-traversal guard a bare "prefer one-liners" prompt drops.
+Total Programming is the only arm with a perfect correctness and safety record. It builds 21% less code than the baseline, and the reframe turned its overheads negative: ~10% fewer tokens and ~20% less wall time than following no principles at all. The cut concentrates where an over-build trap exists (color picker −66%, dropzone −62%, wizard −46%) and stays a wash on irreducible work.
 
-Rows are from separate runs on different days; each is valid against its own baseline. Earlier runs: the v0.2.0 wording measured on 2026-09-18 ([results](benchmarks/results/2026-09-18-haiku.md)) cut 43% LOC at −32% cost. Full method, per-task tables, and limits: [benchmarks/results/2026-09-25-haiku.md](benchmarks/results/2026-09-25-haiku.md).
+Every head-to-head in the table above was decided by the CPO judge: a blind, position-balanced pairwise product judge (Sonnet, anonymous A/B) that infers each solution's intent and unique capabilities, scores **current value** (core quality — an extra counts only when a plausible user need justifies it) and **future value** (change cost against neutral future scenarios, testability, over-engineering) separately, names each side's biggest risk, and cites every claim to code before giving a verdict. Under that lens Total Programming wins **17–7 over ponytail** and **13–10 with one tie over the baseline**: terse wrappers lose points on robustness and silent regressions, while documented contracts and named validation rules count as justified extras.
 
-A 2026-10-02 complete run on a much stronger model tier (GLM 5.3 Flash, pi harness; all 228 cells delivered; [results](benchmarks/results/2026-10-02-glm-flash-complete.md)) shrinks the effect: the paired LOC cut drops to ~22%, Total Programming's token overhead to ~3%, the blind judge splits 14–8 toward Total Programming (mean 3.75 vs 3.46), and ponytail's arm — complete delivery, −60% LOC, the simplest structure — wins the blind head-to-head 15–7. On capable models the baseline already builds simply, leaving principles less to correct.
-
-A rerun on the v0.5.0 wording (same harness, model, fixture, and tasks; [results](benchmarks/results/2026-10-02-glm-flash-05.md)) confirms the pattern with cleaner execution: all 228 cells delivered first-attempt in every arm (no timeout ladder needed), the paired LOC cut is unchanged (79% of baseline), and Total Programming's overheads flip negative — ~10% fewer tokens and ~20% faster than baseline — with the only perfect correctness and safety record (76/76 each) and a wider blind-judge preference (18–4, or 17–4 excluding a walkover; ponytail still wins its head-to-head 15–8).
-
-Post-hoc analysis of the same runs adds two axes: deterministic complexity (lizard, over delivered source) and a blind pairwise readability judge (Sonnet 4.6, anonymous A/B). Total Programming delivers less code by building less — per-function complexity is flat versus the baseline on features and ~35% lower on the safety tasks — and the blind judge prefers its solutions 16–8. Ponytail's own arm, run under the same harness, delivered the smallest code but timed out on 21 of 76 first-attempt cells; all 21 completed on an independent retry under identical conditions (first-attempt completion: 72%).
+Caveats: single run, model, and judge; only the within-run arm comparisons are controlled; the judge covers the six front-end tasks (24 pairs per comparison).
 
 ## Install
 
@@ -235,18 +248,6 @@ hermes plugins install romeobravo/total-programming --enable
 
 Restart Hermes after installing. The plugin injects the full principles before each LLM turn, registers the skill as `total-programming:total-programming`, and adds `/total-programming [on|off]` to switch injection (default on; runtime state is process-local, so it resets on restart). Set the `TOTAL_PROGRAMMING_ENABLED` env var to `0`/`1` for a persistent default.
 
-## How it works
-
-- `skills/total-programming/SKILL.md` is the single source of truth.
-- `hooks/session-start.js` supplies the same text to Claude Code as session context, and `.codex-plugin/plugin.json` points Codex at the same hook and skills.
-- `pi-extension/index.js` appends it to Pi's existing system prompt.
-- `.opencode/plugins/total-programming.mjs` appends it to OpenCode's system prompt every turn and registers `/total-programming`.
-- `.cursor/rules/total-programming.mdc` is the instruction-only Cursor rule.
-- `plugin.yaml` and `__init__.py` inject it into Hermes Agent before each LLM call and register the skill and `/total-programming`.
-- All adapters strip the skill's YAML metadata; none modifies project instruction files, changes tool permissions, or calls a network service.
-
-The principles guide judgment rather than enforce behavior. Installing them does not guarantee model compliance or prove an improvement in development speed.
-
 ## Local development
 
 Clone the repository wherever you keep your projects:
@@ -301,19 +302,17 @@ Invoke `/total-programming` in Claude Code or `/skill:total-programming` in Pi. 
 
 ## Uninstall
 
-Claude Code:
+| Host | Command |
+|------|---------|
+| Claude Code | `/plugin uninstall total-programming@total-programming`; optionally also `/plugin marketplace remove total-programming` |
+| Codex | `codex plugin remove total-programming@total-programming`; optionally also `codex plugin marketplace remove total-programming` |
+| OpenCode | Remove the plugin entry from `opencode.json`; delete the clone if you no longer want it |
+| Cursor | Delete the copied rule: `rm .cursor/rules/total-programming.mdc` |
+| Pi | `pi remove git:github.com/romeobravo/total-programming` (a local install: `pi remove /absolute/path/to/total-programming`) |
+| Hermes Agent | `hermes plugins remove romeobravo/total-programming` |
+| Skill-only installs | Remove the symlink you created: `rm ~/.claude/skills/total-programming` and/or `rm ~/.pi/agent/skills/total-programming` |
 
-```text
-/plugin uninstall total-programming@total-programming
-```
-
-Pi, when installed from GitHub:
-
-```bash
-pi remove git:github.com/romeobravo/total-programming
-```
-
-For a local Pi installation, run `pi remove /absolute/path/to/total-programming` with your checkout's path. For a skill-only installation, remove only the symlink you created.
+These remove everything the plugin or rule added — none of the adapters write state outside their own files, so nothing else is left behind. Restart the host afterwards so the loaded copy goes away.
 
 ## Background
 
