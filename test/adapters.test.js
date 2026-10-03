@@ -12,10 +12,10 @@ const root = new URL('../', import.meta.url);
 const json = (path) => JSON.parse(readFileSync(new URL(path, root), 'utf8'));
 const titles = [
   'Start with the goal and why it matters (Intent)',
-  'Make understanding easy (Clarity)',
-  'Give each part a clear responsibility (Atomicity)',
+  'Make it obvious, not explained (Clarity)',
+  'Give each part one responsibility and a small surface (Atomicity)',
   'Prefer reversible decisions to preserve momentum (Reversibility)',
-  'Enable upside while limiting downside (Asymmetry)',
+  'Focus where it matters (Asymmetry)',
   'Fit the problem, not its noise (Parsimony)',
   'Tackle consequential uncertainty first (Falsification)',
   'Try removing before adding (Subtraction)',
