@@ -8,6 +8,10 @@
 
 <p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/works%20with-6%20agents-111111?style=flat-square" alt="Works with 6 agents">
+</p>
+
 ## Contents
 
 - [Preserve pace through agility](#preserve-pace-through-agility)
