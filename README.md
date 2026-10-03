@@ -4,128 +4,101 @@
 
 <h1 align="center">Total Programming</h1>
 
-<p align="center"><em>11 principles for building software at a sustained pace—for humans and agents.</em></p>
+<p align="center"><em>A team of 11 principles for building products at a sustained pace—for humans and AI agents.</em></p>
 
-<p align="center">
-  <a href="#1-start-with-the-goal-and-why-it-matters--intent">1. Intent</a><br>
-  <a href="#2-make-it-obvious-not-explained--clarity">2. Clarity</a> •
-  <a href="#3-give-each-part-one-responsibility-and-a-small-surface--atomicity">3. Atomicity</a> •
-  <a href="#4-prefer-reversible-decisions-to-preserve-momentum--reversibility">4. Reversibility</a> •
-  <a href="#5-focus-where-it-matters--asymmetry">5. Asymmetry</a><br>
-  <a href="#6-fit-the-problem-not-its-noise--parsimony">6. Parsimony</a> •
-  <a href="#8-try-removing-before-adding--subtraction">8. Subtraction</a> •
-  <a href="#10-reduce-complexity-across-the-whole-system--holism">10. Holism</a><br>
-  <a href="#7-tackle-consequential-uncertainty-first--falsification">7. Falsification</a> •
-  <a href="#9-let-evidence-shape-the-design--empiricism">9. Empiricism</a> •
-  <a href="#11-progress-in-small-verifiable-steps--progression">11. Progression</a>
-</p>
-
-Build software that solves complex problems without making the next move harder than it needs to be. Like Total Football, sustained pace comes from clear responsibilities, coordinated movement, and simple passes that keep the next move available.
-
-For product management, UI/UX, programming, and architecture.
+<p align="center">Product Management • Product Design • Software Architecture • Software Engineering</p>
 
 ## Contents
 
-- [The principles](#the-principles)
+- [Preserve pace through agility](#preserve-pace-through-agility)
+- [Using these principles](#using-these-principles)
 - [Benchmark](#benchmark)
 - [Install](#install)
 - [Local development](#local-development)
 - [Uninstall](#uninstall)
 - [Background](#background)
 
-## The principles
+## Preserve pace through agility
 
-The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), which is the single source of truth. Below, each principle is paired with a Johan Cruyff quote, where it comes from on the pitch, and why it belongs in software.
+**Build software that solves complex problems without making the next move harder than it needs to be.**
 
-### 1. Start with the goal and why it matters — *Intent*
+Sustained pace comes from the ability to understand, change, and validate software with little friction. Keep necessary complexity manageable and remove unnecessary complexity so that each addition does not progressively limit your freedom to act.
 
-> "I hate someone who moves but doesn't know where to."
+Like Total Football, agility is not everyone moving faster independently. It comes from clear responsibilities, coordinated movement, and simple passes that keep the next move available.
 
-**On the pitch.** Total Football only works when every player knows the plan. Players rotate positions and improvise constantly, and that freedom holds together only because everyone is working toward the same goal. A player who moves without knowing where to pulls the team's shape apart.
+**We pursue simplicity not to build less capable software, but to preserve our ability to keep improving it.** These principles apply to interfaces, interactions, code, and architecture—for humans and AI agents alike.
 
-**In software.** Know what someone needs to accomplish, why it matters, and what success looks like before choosing screens, frameworks, or functions. A shared goal with its why lets people adapt the how—take a different route, improvise, swap roles—and still converge. Without it, activity looks like progress while the system drifts apart.
+## 1. Start with purpose, not implementation
 
-### 2. Make it obvious, not explained — *Clarity*
+Understand what someone needs to accomplish and what success looks like before choosing screens, frameworks, or functions. Communicate decisions through that purpose rather than technical detail alone.
 
-> "If I had wanted you to understand it, I would have explained it better."
+A shared direction creates freedom to find the right solution. Clarify consequential ambiguities, challenge work that does not serve the goal, and avoid confusing a proposed implementation with the underlying need.
 
-**On the pitch.** Cruyff was famous for cryptic one-liners, known in Dutch as *Cruijffiaans*, that people still debate decades later. Charming from a football legend.
+## 2. Choose the simplest solution that sufficiently solves the problem
 
-**In software.** Costly anywhere else. Read the quote as the anti-pattern: work that only makes sense once its author explains it. If something needs explaining, first ask whether it can be made obvious instead. Obvious is the result, not the first idea—as Cruyff knew, simple football is the hardest kind. The next person or agent who must change your work should not need an oracle.
+Simplicity is a means to effectiveness, not the outcome itself. Prefer the least complex solution that delivers the intended result without compromising essential security, privacy, accessibility, reliability, or data integrity.
 
-### 3. Give each part one responsibility and a small surface — *Atomicity*
+Additional complexity must earn its place through meaningful benefits relative to its delivery and ongoing costs. Do not sacrifice the core need for minimalism—or sacrifice future agility for completeness, elegance, or hypothetical needs.
 
-> "I'm the worst if I have to defend the whole garden, but I'm the best if I have to defend this part. Everything is about space, nothing more."
+## 3. Try removing before adding
 
-**On the pitch.** Zonal defending: each player is responsible for a defined space, so the team defends as a coordinated unit instead of everyone chasing the ball. The zone is defined, not tiny.
+When a problem appears, ask whether an unnecessary rule, step, dependency, or distinction creates it. Removing the cause can eliminate a whole chain of compensating solutions.
 
-**In software.** Like the Unix philosophy, each part should do one thing well—and like John Ousterhout's deep modules, it should put substantial behavior behind a simple interface. Atomic means indivisible, not small: a part is as large as its responsibility requires, and splitting it further only scatters one idea across several places. Many shallow parts don't remove complexity; they move it into the wiring between them.
+Consider subtraction as a real solution, not merely a cleanup activity. A simpler flow or domain model may solve more than another explanation, setting, condition, or abstraction. Less unnecessary structure means less to work around when things change.
 
-### 4. Prefer reversible decisions to preserve momentum — *Reversibility*
+## 4. Reduce complexity across the whole system
 
-> "If we have the ball, they can't score."
+A shorter implementation is not simpler if users must do more work. A clean screen is not simpler if it hides necessary information. A quick delivery is not quick overall if it creates recurring operational work.
 
-**On the pitch.** Possession. As long as you keep the ball, you decide the next move and the opponent can only react. Lose it, and the initiative is theirs.
+Count the burden wherever it lands: users, interfaces, code, data, operations, support, and maintenance. Preserve the agility of the whole rather than making one part faster at another's expense.
 
-**In software.** A reversible decision keeps the next move yours; an irreversible one gives the ball away. Most decisions are two-way doors, to borrow Jeff Bezos's distinction: make them quickly and let the result guide the next. Save deliberation and stronger evidence for one-way doors, the commitments that are hard to undo. Momentum comes from acting on what you learn, not from refusing to change course.
+## 5. Make understanding easy
 
-### 5. Focus where it matters — *Asymmetry*
+Prefer clear language, familiar interactions, explicit state, and readable code over cleverness. Users should understand what they can do and what happened; maintainers should understand what the code does and why it exists.
 
-> "If you can't win, make sure you don't lose."
+Understanding makes confident action possible. Optimize for the next person or agent who must use, inspect, or change what you build. Brevity helps only when it preserves clarity.
 
-**On the pitch.** No team can play at full intensity everywhere for ninety minutes. It commits where the chance is real, and where the win is not on, it keeps its shape and protects the result.
+## 6. Give each part a clear responsibility
 
-**In software.** The Pareto principle applies: a few flows and pieces of code carry most of the value and most of the risk. Spend extra effort there—plan more, explore alternatives cheaply, get the details right—and move faster everywhere else while keeping failure contained. Prefer bets with bounded downside and open-ended upside, like an optional addition the core path does not depend on. Together with Reversibility, this preserves optionality: one keeps the next move available, the other makes sure each move risks little and can gain much.
+Organize the system into cohesive parts with small, explicit interfaces. Keep related behavior together and unnecessary dependencies apart.
 
-### 6. Fit the problem, not its noise — *Parsimony*
+Clear responsibilities create freedom to act without coordinating every change across the whole system. Good boundaries make parts easier to reason about, test, replace, and remove—not merely smaller.
 
-> "Football is simple. Playing simple football is hard."
+## 7. Resolve consequential uncertainty early
 
-**On the pitch.** Cruyff's teams won through sequences of simple, well-timed passes rather than one brilliant manoeuvre. The hard part is the discipline to choose the simple option when a spectacular one is available.
+Identify the assumption that could invalidate the approach. Test it before investing heavily in work that depends on it.
 
-**In software.** Our natural tendency is to overfit: to shape a solution around every edge case, request, and hypothetical need in front of us. A parsimonious solution captures what the problem consistently requires and ignores the noise, which is exactly why it handles the next case better. Building for needs nobody has observed is overfitting too, just to imagined data.
+Use the smallest credible prototype, usability test, technical spike, or working slice that answers the question. Prioritize uncertainty by its consequences, not by technical difficulty or interest. Learning early preserves room to change direction.
 
-### 7. Tackle consequential uncertainty first — *Falsification*
+## 8. Let evidence correct the design
 
-> "The truth is never exactly as you expect it will be."
+Treat proposed benefits as hypotheses until supported by relevant evidence. Use observed behavior, experiments, and working software to challenge expectations—not merely confirm them.
 
-**On the pitch.** Pressing. Cruyff's teams hunted the ball high up the pitch, because winning it back near the opponent's goal is cheap, and defending in your own box is expensive.
+Neither popularity nor theory is sufficient proof. Compare existing and proposed approaches against the same goal, and distinguish what is observed from what is assumed. The ability to learn and adjust quickly reduces the need to be right upfront.
 
-**In software.** Uncertainty works the same way. Confront the assumption that could invalidate your approach while being wrong still costs a spike, not a rebuild. Try to prove it wrong with the smallest credible prototype, test, or working slice, and rank uncertainty by its consequences, not by technical difficulty or interest.
+## 9. Keep decisions reversible
 
-### 8. Try removing before adding — *Subtraction*
+Prefer choices that can be changed, replaced, or removed without rebuilding everything around them. Require stronger evidence for commitments that are difficult to undo.
 
-> "Quality isn't running a lot; it's being in the right place at the right moment."
+Preserve options through focused solutions and good boundaries, not speculative flexibility. The goal is not to anticipate every future change, but to keep the cost of responding to change manageable.
 
-**On the pitch.** A player who reads the game runs less, not more. Good positioning removes the need to chase; effort spent compensating for poor positioning is effort wasted.
+## 10. Limit downside while enabling upside
 
-**In software.** Many problems are symptoms of an unnecessary rule, step, dependency, or distinction. Removing the cause eliminates the whole chain of compensating solutions: the extra setting, the explanatory tooltip, the special case. Subtraction is a solution, not a cleanup chore.
+Avoid forcing every user or component through extra complexity to benefit a subset. Where appropriate, make specialized capabilities independently usable without burdening the core path.
 
-### 9. Let evidence shape the design — *Empiricism*
+Look for meaningful benefits with bounded costs and failure impact. This creates room to experiment, but optional does not mean free: controls, configuration, dependencies, and code still consume attention and require maintenance.
 
-> "Every disadvantage has its advantage."
+## 11. Progress through small, complete, verifiable steps
 
-**On the pitch.** Cruyff's most famous line. A setback reveals something you could not see before, and the team that adjusts to it gains the edge.
+Build a sequence of understandable changes toward the goal rather than one elaborate solution. Each step should deliver coherent value or answer a meaningful question.
 
-**In software.** Treat proposed benefits as hypotheses. Observed behavior, experiments, and working software should correct your expectations, especially when they disagree with you. A failed assumption is often the most valuable thing you learn, if you let it change the design. Neither popularity nor theory is proof.
+Reduce scope, not essential quality. Verify the intended behavior, use feedback to choose the next step, and remove experiments or scaffolding that no longer serve a purpose. When the next iteration is affordable, fewer decisions need to be settled upfront.
 
-### 10. Reduce complexity across the whole system — *Holism*
+## Using these principles
 
-> "If you're not somewhere, you're either too early or too late."
+These are guides for judgment, not mechanical rules. Their purpose is to help us make trade-offs that solve today's problem while preserving our ability to respond to tomorrow's.
 
-**On the pitch.** In Total Football, a player's position only makes sense relative to the whole team. Being in the wrong place is never a local error: it leaves a gap that someone else has to cover.
-
-**In software.** A shorter implementation is not simpler if users must do more work, and a quick delivery is not quick if it creates recurring operational work. Count the burden wherever it lands: users, interfaces, code, data, operations, support, and maintenance. Moving complexity somewhere else is not removing it.
-
-### 11. Progress in small, verifiable steps — *Progression*
-
-> "You will understand it when you get it."
-
-**On the pitch.** Build-up play: progressing the ball through short passes that each keep possession and open the next option, rather than gambling on one long ball.
-
-**In software.** Build toward something larger through small, complete, verifiable changes rather than one elaborate solution. Understanding follows the step: when the next one is affordable, fewer decisions need settling upfront. Reduce scope, never essential quality.
-
-### When principles pull in different directions
+When they pull in different directions, ask:
 
 > **What is the simplest effective move we can make and validate now that preserves our freedom to make the next one?**
 
@@ -142,15 +115,14 @@ Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned ag
 | tokens, per-task median | 25.1k | 22.5k | 11.9k |
 | wall time, median | 182.5 s | 145.0 s | 65.0 s |
 | safety cc_mean (lizard) | 4.68 | 3.36 | 2.64 |
-| readability judge | — | **18–4** over baseline | 15–8 over total-programming |
 | CPO judge, current value (1–5) | 3.38 | **3.75** | 3.58 |
 | CPO judge, future value (1–5) | 3.25 | **3.83** | 3.83 |
 
 Total Programming is the only arm with a perfect correctness and safety record. It builds 21% less code than the baseline, and the reframe turned its overheads negative: ~10% fewer tokens and ~20% less wall time than following no principles at all. The cut concentrates where an over-build trap exists (color picker −66%, dropzone −62%, wizard −46%) and stays a wash on irreducible work.
 
-Two blind judges read the same delivered code. The readability judge (Sonnet, anonymous A/B) prefers Total Programming 18–4 over the baseline — 17–4 among pairs with code on both sides — and still prefers ponytail 15–8: on prose alone, the thinnest solution wins. The CPO judge weighs what readability cannot see: inferred intent, current and future value against neutral change scenarios, testability, and unflagged capability regressions, with every claim cited to code. Under that lens ponytail's advantage flips to **17–7 for Total Programming** (13–10 with one tie over the baseline): terse wrappers lose points on robustness and silent regressions, while documented contracts and named validation rules count as justified extras.
+Every head-to-head in the table above was decided by the CPO judge: a blind, position-balanced pairwise product judge (Sonnet, anonymous A/B) that infers each solution's intent and unique capabilities, scores **current value** (core quality — an extra counts only when a plausible user need justifies it) and **future value** (change cost against neutral future scenarios, testability, over-engineering) separately, names each side's biggest risk, and cites every claim to code before giving a verdict. Under that lens Total Programming wins **17–7 over ponytail** and **13–10 with one tie over the baseline**: terse wrappers lose points on robustness and silent regressions, while documented contracts and named validation rules count as justified extras.
 
-Caveats: single run, model, and judge; only the within-run arm comparisons are controlled; the judges cover the six front-end tasks (24 pairs per comparison). Earlier runs: on Haiku 4.5 with the v0.4.0 wording ([results](benchmarks/results/2026-09-25-haiku.md)) the principles cut LOC 40% and cost 46% at a perfect safety record; on GLM 5.3 Flash, the v0.4.0 wording measured ~3% token overhead ([results](benchmarks/results/2026-10-02-glm-flash-complete.md)) — the negative overheads above are what the v0.5.0 reframe changed.
+Caveats: single run, model, and judge; only the within-run arm comparisons are controlled; the judge covers the six front-end tasks (24 pairs per comparison).
 
 ## Install
 
@@ -307,5 +279,3 @@ These remove everything the plugin or rule added — none of the adapters write 
 By Ruben Buitelaar, building on [What if Johan Cruyff Was a Software Engineer?](https://medium.com/@rubenbuitelaar/what-if-johan-cruyff-was-a-software-engineer-237d22da5bb?sk=527a69571726edc74f1dd263a1509f63) and his work on tackling complexity.
 
 Packaging inspired by [Ponytail](https://github.com/DietrichGebert/ponytail); implementation and principles are independent.
-
-Cruyff quotes are translated from Dutch, some loosely to convey their intent. Like most *Cruijffiaans*, they circulate in several versions.
