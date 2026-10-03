@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
 
-<p align="center"><em>A team of 11 principles for attacking hard problems at a sustained pace—for humans and AI agents.</em></p>
+<p align="center"><em>A team of 11 principles for attacking hard problems with simple moves—for humans and AI agents.</em></p>
 
 <p align="center">
   <a href="#1-start-with-the-goal-and-why-it-matters--intent">1. Intent</a><br>
