@@ -39,7 +39,7 @@ Solution B:
 {b}
 
 Respond with ONLY this JSON:
-{{"a_score": <1-5 int>, "b_score": <1-5 int>, "prefer": "<a|b|tie>", "why": "<one line>"}}"""
+{{"a_score": <1-5 int>, "b_score": <1-5 int>, "prefer": "<a|b|tie>", "why": "<1-3 sentences>"}}"""
 
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -80,7 +80,7 @@ def judge_pair(judge, pair, a_text, b_text, a_arm, b_arm):
             if data.get('prefer') in ('a', 'b', 'tie'):
                 return {'pair': pair, 'a_arm': a_arm, 'b_arm': b_arm,
                         'a_score': data['a_score'], 'b_score': data['b_score'],
-                        'prefer': data['prefer'], 'why': data.get('why', '')[:200]}
+                        'prefer': data['prefer'], 'why': data.get('why', '')[:1000]}
         except Exception:
             pass
     return {'pair': pair, 'a_arm': a_arm, 'b_arm': b_arm, 'error': 'judge did not return valid JSON'}
