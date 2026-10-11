@@ -144,11 +144,28 @@ The agent-facing text lives in [`SKILL.md`](skills/total-programming/SKILL.md), 
 
 ## Benchmark
 
-Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned agentic benchmark on **GLM 5.3 Flash** (pi harness): 228 real headless agent sessions — 19 tasks × 3 arms (clean no-skill baseline, total-programming, ponytail) × 4 repetitions — editing a real FastAPI + React repo, scored on the delivered `git diff` and adversarial safety checks. Same tasks, fixture, and scorers as Ponytail's published run. All 228 cells delivered first-attempt, no timeouts. Full method, per-task tables, and limits: [benchmarks/results/2026-10-02-glm-flash-05.md](benchmarks/results/2026-10-02-glm-flash-05.md).
+Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned agentic benchmark, most recently on **Claude Haiku 5.5** (claude CLI): 228 real headless agent sessions — 19 tasks × 3 arms (clean no-skill baseline, total-programming, ponytail) × 4 repetitions — editing a real FastAPI + React repo, scored on the delivered `git diff` and adversarial safety checks. Same tasks, fixture, scorers, and pinned SKILL.md wording as the GLM 5.3 Flash run, so cross-model comparisons are wording-controlled. All 228 cells delivered first-attempt, no timeouts. Full method, per-task tables, and limits: [benchmarks/results/2026-10-11-haiku-5-5.md](benchmarks/results/2026-10-11-haiku-5-5.md).
 
 | metric | baseline | total-programming | ponytail |
 |---|---:|---:|---:|
 | delivered | 76/76 | 76/76 | 76/76 |
+| correct / safe | 72/76 | 72/76 | 72/76 |
+| LOC, geo-mean vs baseline | — | 88.5% | 60.7% |
+| tokens, per-task median | 8.0k | 5.8k | 3.9k |
+| wall time, median | 33.4 s | 24.9 s | 18.1 s |
+| safety cc_mean (lizard) | 4.32 | 3.21 | 2.93 |
+| CPO judge, current value (1–5) | **3.92** | 3.67 | 3.42 |
+| CPO judge, future value (1–5) | **4.00** | 3.46 | 3.75 |
+
+(The only correctness/safety misses are the cache task's by-design over-engineering axis, identical across arms.)
+
+On Haiku 5.5 both skill arms cut code, tokens, wall time and cyclomatic complexity well below the baseline — but the CPO judge flips the quality comparison: the unassisted baseline wins **18–5 over total-programming** and **19–4 over ponytail**, while total-programming still beats ponytail **16–8**. On GLM 5.3 Flash the skills beat the baseline on the same lens (previous run, below). The value of appended principles is strongly model-dependent: where a model's baseline already delivers product-grade code on these tasks, the principles' measurable effect is resource reduction, not perceived quality.
+
+Previous run — **GLM 5.3 Flash** (pi harness): all 228 cells delivered first-attempt, no timeouts. Full method, per-task tables, and limits: [benchmarks/results/2026-10-02-glm-flash-05.md](benchmarks/results/2026-10-02-glm-flash-05.md).
+
+| metric | baseline | total-programming | ponytail |
+|---|---:|---:|---:|
+| delivered | 76/76 | **76/76** | 76/76 |
 | correct | 73/76 | **76/76** | 75/76 |
 | safe | 74/76 | **76/76** | 75/76 |
 | LOC, geo-mean vs baseline | — | 79.1% | 39.3% |
@@ -158,11 +175,11 @@ Measured with [Ponytail](https://github.com/DietrichGebert/ponytail)'s pinned ag
 | CPO judge, current value (1–5) | 3.38 | **3.75** | 3.58 |
 | CPO judge, future value (1–5) | 3.25 | **3.83** | 3.83 |
 
-Total Programming is the only arm with a perfect correctness and safety record. It builds 21% less code than the baseline, and the reframe turned its overheads negative: ~10% fewer tokens and ~20% less wall time than following no principles at all. The cut concentrates where an over-build trap exists (color picker −66%, dropzone −62%, wizard −46%) and stays a wash on irreducible work.
+There, Total Programming is the only arm with a perfect correctness and safety record. It builds 21% less code than the baseline, and the reframe turned its overheads negative: ~10% fewer tokens and ~20% less wall time than following no principles at all. The cut concentrates where an over-build trap exists (color picker −66%, dropzone −62%, wizard −46%) and stays a wash on irreducible work.
 
-Every head-to-head in the table above was decided by the CPO judge: a blind, position-balanced pairwise product judge (Sonnet, anonymous A/B) that infers each solution's intent and unique capabilities, scores **current value** (core quality — an extra counts only when a plausible user need justifies it) and **future value** (change cost against neutral future scenarios, testability, over-engineering) separately, names each side's biggest risk, and cites every claim to code before giving a verdict. Under that lens Total Programming wins **17–7 over ponytail** and **13–10 with one tie over the baseline**: terse wrappers lose points on robustness and silent regressions, while documented contracts and named validation rules count as justified extras.
+Every head-to-head was decided by the CPO judge: a blind, position-balanced pairwise product judge (Sonnet, anonymous A/B) that infers each solution's intent and unique capabilities, scores **current value** (core quality — an extra counts only when a plausible user need justifies it) and **future value** (change cost against neutral future scenarios, testability, over-engineering) separately, names each side's biggest risk, and cites every claim to code before giving a verdict. On GLM 5.3 Flash it has Total Programming winning **17–7 over ponytail** and **13–10 with one tie over the baseline**: terse wrappers lose points on robustness and silent regressions, while documented contracts and named validation rules count as justified extras. On Haiku 5.5 the same lens again favors total-programming over ponytail (**16–8**) but hands both comparisons to the baseline (**18–5** and **19–4**).
 
-Caveats: single run, model, and judge; only the within-run arm comparisons are controlled; the judge covers the six front-end tasks (24 pairs per comparison).
+Caveats: per-run single model and judge; only within-run arm comparisons are controlled; cross-model rows conflate harness (pi vs claude CLI); the judges cover the six front-end tasks (24 pairs per comparison).
 
 ## Install
 
